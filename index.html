@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -310,7 +311,7 @@
 
 <!-- ABOUT -->
 
-<section class="section about-section" id="about">
+<section class="section" id="about">
 
   <div class="head">
 
@@ -443,49 +444,117 @@
       </div>
 
       <div class="field">
-        <label for="enquiry_type">TYPE OF GIFTING *</label>
+
+        <label for="enquiry_type">
+          TYPE OF GIFTING *
+        </label>
 
         <select id="enquiry_type" name="enquiry_type" required>
 
-          <option value="">Select an option</option>
-          <option>Client appreciation</option>
-          <option>Employee gifts & rewards</option>
-          <option>Onboarding</option>
-          <option>Events & conferences</option>
-          <option>Bespoke hampers</option>
-          <option>Branded & bulk orders</option>
-          <option>Personal gifting</option>
+          <option value="">
+            Select an option
+          </option>
+
+          <option>
+            Client appreciation
+          </option>
+
+          <option>
+            Employee gifts & rewards
+          </option>
+
+          <option>
+            Onboarding
+          </option>
+
+          <option>
+            Events & conferences
+          </option>
+
+          <option>
+            Bespoke hampers
+          </option>
+
+          <option>
+            Branded & bulk orders
+          </option>
+
+          <option>
+            Personal gifting
+          </option>
 
         </select>
 
       </div>
 
       <div class="field">
-        <label for="quantity">NUMBER OF GIFTS</label>
+        <label for="quantity">
+          NUMBER OF GIFTS
+        </label>
+
         <input id="quantity" type="number" min="1" name="quantity">
       </div>
 
       <div class="field">
-        <label for="budget">APPROXIMATE BUDGET PER GIFT</label>
-        <input id="budget" name="budget" placeholder="e.g. £50">
+
+        <label for="budget">
+          APPROXIMATE BUDGET PER GIFT
+        </label>
+
+        <input
+          id="budget"
+          name="budget"
+          placeholder="e.g. £50"
+        >
+
       </div>
 
       <div class="field">
-        <label for="timeline">REQUIRED DELIVERY DATE</label>
-        <input id="timeline" type="date" name="timeline">
+
+        <label for="timeline">
+          REQUIRED DELIVERY DATE
+        </label>
+
+        <input
+          id="timeline"
+          type="date"
+          name="timeline"
+        >
+
       </div>
 
       <div class="field">
-        <label for="phone">PHONE</label>
-        <input id="phone" type="tel" name="phone">
+
+        <label for="phone">
+          PHONE
+        </label>
+
+        <input
+          id="phone"
+          type="tel"
+          name="phone"
+        >
+
       </div>
 
       <div class="field">
-        <label for="message">MESSAGE</label>
-        <textarea id="message" name="message"></textarea>
+
+        <label for="message">
+          MESSAGE
+        </label>
+
+        <textarea
+          id="message"
+          name="message"
+        ></textarea>
+
       </div>
 
-      <button class="btn primary" type="submit" id="enquirySubmit">
+      <button
+        class="btn primary"
+        type="submit"
+        id="enquirySubmit"
+      >
         SEND ENQUIRY
       </button>
 
@@ -536,29 +605,72 @@
         <form id="authForm">
 
           <div class="field">
-            <label>EMAIL ADDRESS</label>
-            <input id="authEmail" type="email" required placeholder="you@company.co.uk">
+
+            <label>
+              EMAIL ADDRESS
+            </label>
+
+            <input
+              id="authEmail"
+              type="email"
+              required
+              placeholder="you@company.co.uk"
+            >
+
           </div>
 
           <div class="field">
-            <label>PASSWORD</label>
-            <input id="authPassword" type="password" required minlength="6" placeholder="••••••••">
+
+            <label>
+              PASSWORD
+            </label>
+
+            <input
+              id="authPassword"
+              type="password"
+              required
+              minlength="6"
+              placeholder="••••••••"
+            >
+
           </div>
 
-          <div id="signupNameField" class="field hidden">
-            <label>FULL NAME</label>
-            <input id="signupName" type="text" placeholder="Your name">
+          <div
+            id="signupNameField"
+            class="field hidden"
+          >
+
+            <label>
+              FULL NAME
+            </label>
+
+            <input
+              id="signupName"
+              type="text"
+              placeholder="Your name"
+            >
+
           </div>
 
-          <button class="btn primary full" type="submit" id="authSubmit">
+          <button
+            class="btn primary full"
+            type="submit"
+            id="authSubmit"
+          >
             SIGN IN
           </button>
 
         </form>
 
-        <div class="auth-message" id="authMessage"></div>
+        <div
+          class="auth-message"
+          id="authMessage"
+        ></div>
 
-        <button class="text-button" id="toggleAuth">
+        <button
+          class="text-button"
+          id="toggleAuth"
+        >
           Need an account? Create one
         </button>
 
@@ -569,16 +681,29 @@
 
     <!-- CUSTOMER PORTAL -->
 
-    <div id="customerPanel" class="portal-panel">
+    <div
+      id="customerPanel"
+      class="portal-panel"
+    >
 
       <div class="portal-header">
 
         <div>
-          <div class="kicker">CUSTOMER PORTAL</div>
-          <h2 id="customerWelcome">Your dashboard</h2>
+
+          <div class="kicker">
+            CUSTOMER PORTAL
+          </div>
+
+          <h2 id="customerWelcome">
+            Your dashboard
+          </h2>
+
         </div>
 
-        <button class="btn" id="customerLogout">
+        <button
+          class="btn"
+          id="customerLogout"
+        >
           SIGN OUT
         </button>
 
@@ -588,33 +713,60 @@
       <div class="dash-grid">
 
         <div class="dash-card">
-          <strong id="activeOrders">0</strong>
-          <span>ACTIVE ORDERS</span>
+
+          <strong id="activeOrders">
+            0
+          </strong>
+
+          <span>
+            ACTIVE ORDERS
+          </span>
+
         </div>
 
         <div class="dash-card">
-          <strong id="totalOrders">0</strong>
-          <span>ORDERS THIS YEAR</span>
+
+          <strong id="totalOrders">
+            0
+          </strong>
+
+          <span>
+            ORDERS THIS YEAR
+          </span>
+
         </div>
 
         <div class="dash-card">
-          <strong id="teamUsers">0</strong>
-          <span>COMPANY USERS</span>
+
+          <strong id="teamUsers">
+            0
+          </strong>
+
+          <span>
+            COMPANY USERS
+          </span>
+
         </div>
 
       </div>
 
 
-      <div id="companyDetails" class="company-card"></div>
+      <div
+        id="companyDetails"
+        class="company-card"
+      ></div>
 
 
-      <h3>Recent orders</h3>
+      <h3>
+        Recent orders
+      </h3>
 
       <div class="table-wrap">
 
         <table class="orders">
 
           <thead>
+
             <tr>
               <th>ORDER</th>
               <th>STATUS</th>
@@ -622,6 +774,7 @@
               <th>DELIVERY</th>
               <th>INVOICE</th>
             </tr>
+
           </thead>
 
           <tbody id="ordersBody"></tbody>
@@ -631,14 +784,21 @@
       </div>
 
 
-      <h3>Company team</h3>
+      <h3>
+        Company team
+      </h3>
 
-      <div id="teamList" class="team-list"></div>
+      <div
+        id="teamList"
+        class="team-list"
+      ></div>
 
 
       <div class="invite-box">
 
-        <h3>Invite an employee</h3>
+        <h3>
+          Invite an employee
+        </h3>
 
         <p>
           Company administrators can invite employees to access the customer portal.
@@ -646,9 +806,16 @@
 
         <div class="invite-row">
 
-          <input id="inviteEmail" type="email" placeholder="employee@company.co.uk">
+          <input
+            id="inviteEmail"
+            type="email"
+            placeholder="employee@company.co.uk"
+          >
 
-          <button class="btn primary" id="inviteButton">
+          <button
+            class="btn primary"
+            id="inviteButton"
+          >
             INVITE EMPLOYEE
           </button>
 
@@ -663,16 +830,29 @@
 
     <!-- ADMIN -->
 
-    <div id="adminPanel" class="portal-panel">
+    <div
+      id="adminPanel"
+      class="portal-panel"
+    >
 
       <div class="portal-header">
 
         <div>
-          <div class="kicker">ADMINISTRATION</div>
-          <h2>Manage The Gesture Co.</h2>
+
+          <div class="kicker">
+            ADMINISTRATION
+          </div>
+
+          <h2>
+            Manage The Gesture Co.
+          </h2>
+
         </div>
 
-        <button class="btn" id="adminLogout">
+        <button
+          class="btn"
+          id="adminLogout"
+        >
           SIGN OUT
         </button>
 
@@ -691,56 +871,142 @@
 
         <div class="admin-box">
 
-          <h3>Add a product</h3>
+          <h3>
+            Add a product
+          </h3>
 
           <form id="productForm">
 
             <div class="field">
-              <label>PRODUCT NAME *</label>
-              <input id="productName" required placeholder="Executive Gift Box">
+
+              <label>
+                PRODUCT NAME *
+              </label>
+
+              <input
+                id="productName"
+                required
+                placeholder="Executive Gift Box"
+              >
+
             </div>
 
             <div class="field">
-              <label>SLUG</label>
-              <input id="productSlug" placeholder="executive-gift-box">
+
+              <label>
+                SLUG
+              </label>
+
+              <input
+                id="productSlug"
+                placeholder="executive-gift-box"
+              >
+
             </div>
 
             <div class="field">
-              <label>PRICE *</label>
-              <input id="productPrice" required type="number" min="0" step="0.01" placeholder="45.00">
+
+              <label>
+                PRICE *
+              </label>
+
+              <input
+                id="productPrice"
+                required
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="45.00"
+              >
+
             </div>
 
             <div class="field">
-              <label>CATEGORY</label>
+
+              <label>
+                CATEGORY
+              </label>
 
               <select id="productCategory">
-                <option>Corporate</option>
-                <option>Client Gifts</option>
-                <option>Employee Gifts</option>
-                <option>Onboarding</option>
-                <option>Hampers</option>
-                <option>Events</option>
-                <option>Personal</option>
+
+                <option>
+                  Corporate
+                </option>
+
+                <option>
+                  Client Gifts
+                </option>
+
+                <option>
+                  Employee Gifts
+                </option>
+
+                <option>
+                  Onboarding
+                </option>
+
+                <option>
+                  Hampers
+                </option>
+
+                <option>
+                  Events
+                </option>
+
+                <option>
+                  Personal
+                </option>
+
               </select>
 
             </div>
 
             <div class="field">
-              <label>MINIMUM QUANTITY</label>
-              <input id="productMinimum" type="number" min="1" value="1">
+
+              <label>
+                MINIMUM QUANTITY
+              </label>
+
+              <input
+                id="productMinimum"
+                type="number"
+                min="1"
+                value="1"
+              >
+
             </div>
 
             <div class="field">
-              <label>DESCRIPTION</label>
-              <textarea id="productDescription" rows="5"></textarea>
+
+              <label>
+                DESCRIPTION
+              </label>
+
+              <textarea
+                id="productDescription"
+                rows="5"
+              ></textarea>
+
             </div>
 
             <div class="field">
-              <label>PRODUCT IMAGE</label>
-              <input id="productImage" type="file" accept="image/*">
+
+              <label>
+                PRODUCT IMAGE
+              </label>
+
+              <input
+                id="productImage"
+                type="file"
+                accept="image/*"
+              >
+
             </div>
 
-            <button class="btn primary full" type="submit">
+            <button
+              class="btn primary full"
+              type="submit"
+            >
               SAVE PRODUCT
             </button>
 
@@ -755,9 +1021,14 @@
 
         <div class="admin-box">
 
-          <h3>Products</h3>
+          <h3>
+            Products
+          </h3>
 
-          <div id="adminProducts" class="admin-products">
+          <div
+            id="adminProducts"
+            class="admin-products"
+          >
             Loading products...
           </div>
 
@@ -768,13 +1039,16 @@
 
         <div class="admin-box admin-wide">
 
-          <h3>Orders</h3>
+          <h3>
+            Orders
+          </h3>
 
           <div class="table-wrap">
 
             <table class="orders">
 
               <thead>
+
                 <tr>
                   <th>ORDER</th>
                   <th>COMPANY</th>
@@ -782,6 +1056,7 @@
                   <th>TOTAL</th>
                   <th>DATE</th>
                 </tr>
+
               </thead>
 
               <tbody id="adminOrdersBody"></tbody>
@@ -797,7 +1072,9 @@
 
         <div class="admin-box admin-wide">
 
-          <h3>Companies</h3>
+          <h3>
+            Companies
+          </h3>
 
           <div id="adminCompanies">
             Loading companies...
@@ -818,3 +1095,4 @@
 
 </body>
 </html>
+```
