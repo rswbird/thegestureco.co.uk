@@ -1,0 +1,9 @@
+{
+  "name": "the-gesture-co",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@netlify/functions": "^4.2.3",
+    "resend": "^6.1.2"
+  }
+}
