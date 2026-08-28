@@ -6,8 +6,6 @@
   --muted:#687286;
   --line:#e6e0d6;
   --white:#ffffff;
-  --radius:14px;
-  --radius-lg:20px;
 }
 
 *{
@@ -108,10 +106,6 @@ button:disabled{
   letter-spacing:.7px;
 }
 
-.links a{
-  transition:color .2s ease;
-}
-
 .links a:hover{
   color:var(--gold);
 }
@@ -125,16 +119,20 @@ button:disabled{
 .nav-enquire{
   padding:10px 15px;
   font-size:10px;
+  min-height:36px;
+  border-radius:10px;
 }
 
 .account-btn{
   border:1px solid var(--gold);
   background:white;
   color:var(--navy);
-  padding:10px 14px;
+  padding:10px 15px;
   font-size:10px;
   font-weight:bold;
   letter-spacing:1px;
+  min-height:36px;
+  line-height:normal;
   border-radius:10px;
   transition:all .2s ease;
 }
@@ -184,7 +182,6 @@ button:disabled{
   padding:13px 15px;
   text-align:center;
   margin-top:5px;
-  border-radius:10px;
 }
 
 
@@ -244,27 +241,19 @@ button:disabled{
   transition:all .2s ease;
 }
 
-.btn:hover{
-  transform:translateY(-1px);
-}
-
 .btn.primary{
   background:var(--navy);
   color:white;
 }
 
 .btn.primary:hover{
-  background:#192a45;
+  transform:translateY(-1px);
+  box-shadow:0 8px 20px rgba(16,28,48,.15);
 }
 
 .btn.gold{
   border-color:var(--gold);
   color:var(--gold);
-}
-
-.btn.gold:hover{
-  background:var(--gold);
-  color:white;
 }
 
 .btn.small{
@@ -289,28 +278,47 @@ button:disabled{
 
 
 /* =========================================================
+   HERO EDITORIAL LAYOUT
+========================================================= */
+
+.hero .copy{
+  display:grid;
+  grid-template-columns:170px minmax(0,1fr);
+  column-gap:35px;
+  align-content:center;
+}
+
+.hero .copy .kicker{
+  grid-column:2;
+  grid-row:1;
+}
+
+.hero .copy h1{
+  grid-column:2;
+  grid-row:2;
+}
+
+.hero .copy p{
+  grid-column:1;
+  grid-row:2;
+  align-self:center;
+  margin:0;
+  font-size:13px;
+  line-height:1.75;
+}
+
+.hero .copy .buttons{
+  grid-column:2;
+  grid-row:3;
+}
+
+
+/* =========================================================
    TRUST
 ========================================================= */
 
 .trust{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  margin:0 5%;
-  background:var(--line);
-  gap:1px;
-  border-radius:var(--radius);
-  overflow:hidden;
-}
-
-.trust div{
-  background:white;
-  text-align:center;
-  padding:22px;
-  font-size:12px;
-}
-
-.trust strong{
-  display:block;
+  display:none;
 }
 
 
@@ -356,18 +364,14 @@ button:disabled{
 .card{
   border:1px solid var(--line);
   background:white;
-  border-radius:var(--radius-lg);
+  border-radius:16px;
   overflow:hidden;
-  transition:
-    transform .25s ease,
-    box-shadow .25s ease,
-    border-color .25s ease;
+  transition:transform .2s ease,box-shadow .2s ease;
 }
 
 .card:hover{
-  transform:translateY(-4px);
+  transform:translateY(-3px);
   box-shadow:0 12px 30px rgba(16,28,48,.08);
-  border-color:#d8d0c3;
 }
 
 .pic{
@@ -457,7 +461,6 @@ button:disabled{
 .customimg{
   height:410px;
   background:url("hero-concept.png") 42% center/cover;
-  border-radius:var(--radius-lg);
 }
 
 .custom h2{
@@ -552,7 +555,6 @@ footer p{
   align-items:center;
   justify-content:center;
   padding:20px;
-  backdrop-filter:blur(5px);
 }
 
 .modal.open{
@@ -567,8 +569,8 @@ footer p{
   position:relative;
   max-height:92vh;
   overflow:auto;
-  border-radius:var(--radius-lg);
-  box-shadow:0 25px 70px rgba(0,0,0,.2);
+  border-radius:20px;
+  box-shadow:0 30px 80px rgba(0,0,0,.25);
 }
 
 .close{
@@ -618,22 +620,19 @@ footer p{
 .field textarea,
 .invite-row input{
   width:100%;
-  padding:12px 14px;
+  padding:12px;
   border:1px solid var(--line);
   background:white;
-  border-radius:10px;
-  outline:none;
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease;
+  border-radius:8px;
 }
 
 .field input:focus,
 .field select:focus,
 .field textarea:focus,
 .invite-row input:focus{
+  outline:none;
   border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(182,138,74,.12);
+  box-shadow:0 0 0 3px rgba(182,138,74,.1);
 }
 
 .field textarea{
@@ -647,7 +646,6 @@ footer p{
   padding:14px;
   margin-top:15px;
   font-size:13px;
-  border-radius:10px;
 }
 
 .success{
@@ -665,7 +663,6 @@ footer p{
   padding:12px;
   margin-top:15px;
   font-size:12px;
-  border-radius:10px;
 }
 
 .error-message{
@@ -674,7 +671,6 @@ footer p{
   padding:12px;
   margin-top:15px;
   font-size:12px;
-  border-radius:10px;
 }
 
 .auth-message{
@@ -693,7 +689,7 @@ footer p{
 
 
 /* =========================================================
-   PORTAL
+   ACCOUNT PORTAL
 ========================================================= */
 
 .portal{
@@ -702,7 +698,7 @@ footer p{
   inset:0;
   background:rgba(16,28,48,.78);
   z-index:100;
-  padding:25px;
+  padding:30px;
   overflow:auto;
   align-items:center;
   justify-content:center;
@@ -714,15 +710,34 @@ footer p{
 }
 
 .portal-box{
-  max-width:1100px;
-  width:100%;
-  margin:0 auto;
+  width:min(1100px,calc(100vw - 60px));
+  height:min(760px,calc(100vh - 60px));
+  max-height:calc(100vh - 60px);
+  margin:0;
   background:var(--cream);
-  min-height:650px;
   padding:35px;
   position:relative;
   border-radius:24px;
-  box-shadow:0 30px 80px rgba(0,0,0,.25);
+  box-shadow:0 30px 90px rgba(0,0,0,.3);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.portal-box{
+  scrollbar-width:thin;
+}
+
+.portal-box::-webkit-scrollbar{
+  width:7px;
+}
+
+.portal-box::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.portal-box::-webkit-scrollbar-thumb{
+  background:#cfc7ba;
+  border-radius:20px;
 }
 
 .portal-close{
@@ -749,8 +764,7 @@ footer p{
   background:white;
   padding:35px;
   border:1px solid var(--line);
-  border-radius:var(--radius-lg);
-  box-shadow:0 15px 40px rgba(16,28,48,.06);
+  border-radius:18px;
 }
 
 .portal-header{
@@ -782,13 +796,7 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:22px;
-  border-radius:var(--radius);
-  transition:transform .2s ease,box-shadow .2s ease;
-}
-
-.dash-card:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 25px rgba(16,28,48,.06);
+  border-radius:14px;
 }
 
 .dash-card strong{
@@ -811,7 +819,7 @@ footer p{
   border:1px solid var(--line);
   padding:20px;
   margin-bottom:35px;
-  border-radius:var(--radius);
+  border-radius:14px;
 }
 
 .company-card div{
@@ -835,7 +843,6 @@ footer p{
 .table-wrap{
   width:100%;
   overflow-x:auto;
-  border-radius:var(--radius);
 }
 
 .orders{
@@ -843,6 +850,8 @@ footer p{
   border-collapse:collapse;
   background:white;
   min-width:700px;
+  border-radius:12px;
+  overflow:hidden;
 }
 
 .orders th,
@@ -856,10 +865,6 @@ footer p{
 .orders th{
   font-size:9px;
   letter-spacing:.8px;
-}
-
-.orders tr:last-child td{
-  border-bottom:0;
 }
 
 .status{
@@ -881,7 +886,7 @@ footer p{
 .team-list{
   background:white;
   border:1px solid var(--line);
-  border-radius:var(--radius);
+  border-radius:12px;
   overflow:hidden;
 }
 
@@ -918,7 +923,7 @@ footer p{
   padding:25px;
   margin-top:30px;
   border:1px solid var(--line);
-  border-radius:var(--radius);
+  border-radius:14px;
 }
 
 .invite-row{
@@ -938,7 +943,7 @@ footer p{
   font-size:12px;
   border-left:3px solid #6f8b72;
   margin-bottom:20px;
-  border-radius:10px;
+  border-radius:6px;
 }
 
 .admin-grid{
@@ -951,7 +956,7 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:25px;
-  border-radius:var(--radius-lg);
+  border-radius:14px;
 }
 
 .admin-box h3{
@@ -975,13 +980,7 @@ footer p{
   display:flex;
   flex-direction:column;
   gap:5px;
-  border-radius:var(--radius);
-  transition:transform .2s ease,box-shadow .2s ease;
-}
-
-.product-item:hover{
-  transform:translateY(-2px);
-  box-shadow:0 8px 25px rgba(16,28,48,.06);
+  border-radius:12px;
 }
 
 .product-item img{
@@ -989,7 +988,7 @@ footer p{
   height:130px;
   object-fit:cover;
   margin-bottom:8px;
-  border-radius:10px;
+  border-radius:8px;
 }
 
 .product-item strong{
@@ -1006,7 +1005,7 @@ footer p{
 
 .company-admin-list{
   border:1px solid var(--line);
-  border-radius:var(--radius);
+  border-radius:12px;
   overflow:hidden;
 }
 
@@ -1043,7 +1042,7 @@ footer p{
 
 
 /* =========================================================
-   RESPONSIVE
+   TABLET
 ========================================================= */
 
 @media(max-width:900px){
@@ -1061,6 +1060,25 @@ footer p{
   .split,
   .custom{
     grid-template-columns:1fr;
+  }
+
+  .hero .copy{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .hero .copy .kicker,
+  .hero .copy h1,
+  .hero .copy p,
+  .hero .copy .buttons{
+    width:auto;
+    margin-left:0;
+  }
+
+  .hero .copy p{
+    margin-bottom:30px;
+    font-size:16px;
   }
 
   .heroimg{
@@ -1082,7 +1100,24 @@ footer p{
 }
 
 
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media(max-width:700px){
+
+  .portal{
+    padding:12px;
+    align-items:center;
+  }
+
+  .portal-box{
+    width:calc(100vw - 24px);
+    height:calc(100vh - 24px);
+    max-height:calc(100vh - 24px);
+    padding:22px 15px;
+    border-radius:18px;
+  }
 
   .dash-grid,
   .admin-grid{
@@ -1093,13 +1128,8 @@ footer p{
     grid-column:auto;
   }
 
-  .portal-box{
-    padding:20px 12px;
-    border-radius:18px;
-  }
-
   .account-btn{
-    padding:8px;
+    padding:8px 10px;
     font-size:9px;
   }
 
@@ -1125,6 +1155,10 @@ footer p{
 
 }
 
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
 
 @media(max-width:560px){
 
@@ -1157,9 +1191,7 @@ footer p{
   }
 
   .trust{
-    grid-template-columns:1fr;
-    margin:0;
-    border-radius:0;
+    display:none;
   }
 
   .section{
@@ -1205,6 +1237,14 @@ footer p{
 
   .portal{
     padding:10px;
+  }
+
+  .portal-box{
+    width:calc(100vw - 20px);
+    height:calc(100vh - 20px);
+    max-height:calc(100vh - 20px);
+    padding:20px 12px;
+    border-radius:16px;
   }
 
   .login-wrap{
