@@ -6,6 +6,8 @@
   --muted:#687286;
   --line:#e6e0d6;
   --white:#ffffff;
+  --radius:14px;
+  --radius-lg:20px;
 }
 
 *{
@@ -106,6 +108,10 @@ button:disabled{
   letter-spacing:.7px;
 }
 
+.links a{
+  transition:color .2s ease;
+}
+
 .links a:hover{
   color:var(--gold);
 }
@@ -129,6 +135,13 @@ button:disabled{
   font-size:10px;
   font-weight:bold;
   letter-spacing:1px;
+  border-radius:10px;
+  transition:all .2s ease;
+}
+
+.account-btn:hover{
+  background:var(--navy);
+  color:white;
 }
 
 .menu{
@@ -171,6 +184,7 @@ button:disabled{
   padding:13px 15px;
   text-align:center;
   margin-top:5px;
+  border-radius:10px;
 }
 
 
@@ -226,6 +240,12 @@ button:disabled{
   font-size:11px;
   font-weight:bold;
   letter-spacing:1px;
+  border-radius:10px;
+  transition:all .2s ease;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
 }
 
 .btn.primary{
@@ -233,14 +253,24 @@ button:disabled{
   color:white;
 }
 
+.btn.primary:hover{
+  background:#192a45;
+}
+
 .btn.gold{
   border-color:var(--gold);
   color:var(--gold);
 }
 
+.btn.gold:hover{
+  background:var(--gold);
+  color:white;
+}
+
 .btn.small{
   padding:8px 12px;
   font-size:9px;
+  border-radius:8px;
 }
 
 .btn.full{
@@ -268,6 +298,8 @@ button:disabled{
   margin:0 5%;
   background:var(--line);
   gap:1px;
+  border-radius:var(--radius);
+  overflow:hidden;
 }
 
 .trust div{
@@ -324,6 +356,18 @@ button:disabled{
 .card{
   border:1px solid var(--line);
   background:white;
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 12px 30px rgba(16,28,48,.08);
+  border-color:#d8d0c3;
 }
 
 .pic{
@@ -413,6 +457,7 @@ button:disabled{
 .customimg{
   height:410px;
   background:url("hero-concept.png") 42% center/cover;
+  border-radius:var(--radius-lg);
 }
 
 .custom h2{
@@ -507,6 +552,7 @@ footer p{
   align-items:center;
   justify-content:center;
   padding:20px;
+  backdrop-filter:blur(5px);
 }
 
 .modal.open{
@@ -521,6 +567,8 @@ footer p{
   position:relative;
   max-height:92vh;
   overflow:auto;
+  border-radius:var(--radius-lg);
+  box-shadow:0 25px 70px rgba(0,0,0,.2);
 }
 
 .close{
@@ -570,9 +618,22 @@ footer p{
 .field textarea,
 .invite-row input{
   width:100%;
-  padding:12px;
+  padding:12px 14px;
   border:1px solid var(--line);
   background:white;
+  border-radius:10px;
+  outline:none;
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.invite-row input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(182,138,74,.12);
 }
 
 .field textarea{
@@ -586,6 +647,7 @@ footer p{
   padding:14px;
   margin-top:15px;
   font-size:13px;
+  border-radius:10px;
 }
 
 .success{
@@ -603,6 +665,7 @@ footer p{
   padding:12px;
   margin-top:15px;
   font-size:12px;
+  border-radius:10px;
 }
 
 .error-message{
@@ -611,6 +674,7 @@ footer p{
   padding:12px;
   margin-top:15px;
   font-size:12px;
+  border-radius:10px;
 }
 
 .auth-message{
@@ -636,12 +700,13 @@ footer p{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(16,28,48,.72);
+  background:rgba(16,28,48,.78);
   z-index:100;
   padding:25px;
   overflow:auto;
   align-items:center;
   justify-content:center;
+  backdrop-filter:blur(7px);
 }
 
 .portal.show{
@@ -656,15 +721,8 @@ footer p{
   min-height:650px;
   padding:35px;
   position:relative;
-}
-
-.portal-box{
-  max-width:1100px;
-  margin:25px auto;
-  background:var(--cream);
-  min-height:650px;
-  padding:35px;
-  position:relative;
+  border-radius:24px;
+  box-shadow:0 30px 80px rgba(0,0,0,.25);
 }
 
 .portal-close{
@@ -674,6 +732,7 @@ footer p{
   border:0;
   background:none;
   font-size:28px;
+  z-index:2;
 }
 
 .portal-panel{
@@ -690,6 +749,8 @@ footer p{
   background:white;
   padding:35px;
   border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  box-shadow:0 15px 40px rgba(16,28,48,.06);
 }
 
 .portal-header{
@@ -721,6 +782,13 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:22px;
+  border-radius:var(--radius);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+
+.dash-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(16,28,48,.06);
 }
 
 .dash-card strong{
@@ -743,6 +811,7 @@ footer p{
   border:1px solid var(--line);
   padding:20px;
   margin-bottom:35px;
+  border-radius:var(--radius);
 }
 
 .company-card div{
@@ -766,6 +835,7 @@ footer p{
 .table-wrap{
   width:100%;
   overflow-x:auto;
+  border-radius:var(--radius);
 }
 
 .orders{
@@ -788,6 +858,10 @@ footer p{
   letter-spacing:.8px;
 }
 
+.orders tr:last-child td{
+  border-bottom:0;
+}
+
 .status{
   color:#8a672f;
   font-weight:bold;
@@ -807,6 +881,8 @@ footer p{
 .team-list{
   background:white;
   border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
 }
 
 .team-member{
@@ -842,6 +918,7 @@ footer p{
   padding:25px;
   margin-top:30px;
   border:1px solid var(--line);
+  border-radius:var(--radius);
 }
 
 .invite-row{
@@ -861,6 +938,7 @@ footer p{
   font-size:12px;
   border-left:3px solid #6f8b72;
   margin-bottom:20px;
+  border-radius:10px;
 }
 
 .admin-grid{
@@ -873,6 +951,7 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:25px;
+  border-radius:var(--radius-lg);
 }
 
 .admin-box h3{
@@ -896,6 +975,13 @@ footer p{
   display:flex;
   flex-direction:column;
   gap:5px;
+  border-radius:var(--radius);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+
+.product-item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(16,28,48,.06);
 }
 
 .product-item img{
@@ -903,6 +989,7 @@ footer p{
   height:130px;
   object-fit:cover;
   margin-bottom:8px;
+  border-radius:10px;
 }
 
 .product-item strong{
@@ -919,6 +1006,8 @@ footer p{
 
 .company-admin-list{
   border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
 }
 
 .company-admin-item{
@@ -1006,6 +1095,7 @@ footer p{
 
   .portal-box{
     padding:20px 12px;
+    border-radius:18px;
   }
 
   .account-btn{
@@ -1069,6 +1159,7 @@ footer p{
   .trust{
     grid-template-columns:1fr;
     margin:0;
+    border-radius:0;
   }
 
   .section{
