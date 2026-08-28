@@ -116,30 +116,30 @@ button:disabled{
   gap:10px;
 }
 
-.nav-enquire{
-  padding:10px 15px;
-  font-size:10px;
-  min-height:36px;
-  border-radius:10px;
-}
-
+/* MY ACCOUNT now matches ENQUIRE */
 .account-btn{
+  height:41px;
+  padding:0 15px;
   border:1px solid var(--gold);
   background:white;
   color:var(--navy);
-  padding:10px 15px;
   font-size:10px;
   font-weight:bold;
   letter-spacing:1px;
-  min-height:36px;
-  line-height:normal;
-  border-radius:10px;
-  transition:all .2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
 }
 
-.account-btn:hover{
-  background:var(--navy);
-  color:white;
+.nav-enquire{
+  height:41px;
+  padding:0 15px;
+  font-size:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
 }
 
 .menu{
@@ -237,18 +237,11 @@ button:disabled{
   font-size:11px;
   font-weight:bold;
   letter-spacing:1px;
-  border-radius:10px;
-  transition:all .2s ease;
 }
 
 .btn.primary{
   background:var(--navy);
   color:white;
-}
-
-.btn.primary:hover{
-  transform:translateY(-1px);
-  box-shadow:0 8px 20px rgba(16,28,48,.15);
 }
 
 .btn.gold{
@@ -259,7 +252,6 @@ button:disabled{
 .btn.small{
   padding:8px 12px;
   font-size:9px;
-  border-radius:8px;
 }
 
 .btn.full{
@@ -278,51 +270,6 @@ button:disabled{
 
 
 /* =========================================================
-   HERO EDITORIAL LAYOUT
-========================================================= */
-
-.hero .copy{
-  display:grid;
-  grid-template-columns:170px minmax(0,1fr);
-  column-gap:35px;
-  align-content:center;
-}
-
-.hero .copy .kicker{
-  grid-column:2;
-  grid-row:1;
-}
-
-.hero .copy h1{
-  grid-column:2;
-  grid-row:2;
-}
-
-.hero .copy p{
-  grid-column:1;
-  grid-row:2;
-  align-self:center;
-  margin:0;
-  font-size:13px;
-  line-height:1.75;
-}
-
-.hero .copy .buttons{
-  grid-column:2;
-  grid-row:3;
-}
-
-
-/* =========================================================
-   TRUST
-========================================================= */
-
-.trust{
-  display:none;
-}
-
-
-/* =========================================================
    SECTIONS
 ========================================================= */
 
@@ -331,10 +278,10 @@ button:disabled{
 }
 
 .head{
-  display:flex;
-  justify-content:space-between;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(320px,450px);
   align-items:end;
-  gap:30px;
+  gap:60px;
   margin-bottom:35px;
 }
 
@@ -348,6 +295,7 @@ button:disabled{
   max-width:450px;
   color:var(--muted);
   font-size:14px;
+  margin:0 0 3px;
 }
 
 
@@ -364,14 +312,6 @@ button:disabled{
 .card{
   border:1px solid var(--line);
   background:white;
-  border-radius:16px;
-  overflow:hidden;
-  transition:transform .2s ease,box-shadow .2s ease;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-  box-shadow:0 12px 30px rgba(16,28,48,.08);
 }
 
 .pic{
@@ -497,6 +437,16 @@ button:disabled{
 
 
 /* =========================================================
+   ABOUT
+========================================================= */
+
+.about-section{
+  padding-top:80px;
+  padding-bottom:80px;
+}
+
+
+/* =========================================================
    CTA
 ========================================================= */
 
@@ -569,8 +519,6 @@ footer p{
   position:relative;
   max-height:92vh;
   overflow:auto;
-  border-radius:20px;
-  box-shadow:0 30px 80px rgba(0,0,0,.25);
 }
 
 .close{
@@ -623,16 +571,6 @@ footer p{
   padding:12px;
   border:1px solid var(--line);
   background:white;
-  border-radius:8px;
-}
-
-.field input:focus,
-.field select:focus,
-.field textarea:focus,
-.invite-row input:focus{
-  outline:none;
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(182,138,74,.1);
 }
 
 .field textarea{
@@ -689,8 +627,13 @@ footer p{
 
 
 /* =========================================================
-   ACCOUNT PORTAL
+   CUSTOMER / ADMIN PORTAL
 ========================================================= */
+
+/*
+   The portal is now a proper floating window.
+   You can see the edges all around it.
+*/
 
 .portal{
   display:none;
@@ -698,11 +641,10 @@ footer p{
   inset:0;
   background:rgba(16,28,48,.78);
   z-index:100;
-  padding:30px;
-  overflow:auto;
+  padding:35px;
+  overflow:hidden;
   align-items:center;
   justify-content:center;
-  backdrop-filter:blur(7px);
 }
 
 .portal.show{
@@ -710,34 +652,15 @@ footer p{
 }
 
 .portal-box{
-  width:min(1100px,calc(100vw - 60px));
-  height:min(760px,calc(100vh - 60px));
-  max-height:calc(100vh - 60px);
-  margin:0;
+  width:min(1100px,100%);
+  height:min(820px,calc(100vh - 70px));
+  margin:0 auto;
   background:var(--cream);
-  padding:35px;
   position:relative;
-  border-radius:24px;
-  box-shadow:0 30px 90px rgba(0,0,0,.3);
   overflow-y:auto;
   overflow-x:hidden;
-}
-
-.portal-box{
-  scrollbar-width:thin;
-}
-
-.portal-box::-webkit-scrollbar{
-  width:7px;
-}
-
-.portal-box::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-.portal-box::-webkit-scrollbar-thumb{
-  background:#cfc7ba;
-  border-radius:20px;
+  padding:40px;
+  box-shadow:0 20px 70px rgba(0,0,0,.3);
 }
 
 .portal-close{
@@ -747,7 +670,8 @@ footer p{
   border:0;
   background:none;
   font-size:28px;
-  z-index:2;
+  z-index:5;
+  line-height:1;
 }
 
 .portal-panel{
@@ -760,11 +684,10 @@ footer p{
 
 .login-wrap{
   max-width:430px;
-  margin:50px auto;
+  margin:40px auto;
   background:white;
   padding:35px;
   border:1px solid var(--line);
-  border-radius:18px;
 }
 
 .portal-header{
@@ -796,7 +719,6 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:22px;
-  border-radius:14px;
 }
 
 .dash-card strong{
@@ -819,7 +741,6 @@ footer p{
   border:1px solid var(--line);
   padding:20px;
   margin-bottom:35px;
-  border-radius:14px;
 }
 
 .company-card div{
@@ -850,8 +771,6 @@ footer p{
   border-collapse:collapse;
   background:white;
   min-width:700px;
-  border-radius:12px;
-  overflow:hidden;
 }
 
 .orders th,
@@ -886,8 +805,6 @@ footer p{
 .team-list{
   background:white;
   border:1px solid var(--line);
-  border-radius:12px;
-  overflow:hidden;
 }
 
 .team-member{
@@ -923,7 +840,6 @@ footer p{
   padding:25px;
   margin-top:30px;
   border:1px solid var(--line);
-  border-radius:14px;
 }
 
 .invite-row{
@@ -943,7 +859,6 @@ footer p{
   font-size:12px;
   border-left:3px solid #6f8b72;
   margin-bottom:20px;
-  border-radius:6px;
 }
 
 .admin-grid{
@@ -956,7 +871,6 @@ footer p{
   background:white;
   border:1px solid var(--line);
   padding:25px;
-  border-radius:14px;
 }
 
 .admin-box h3{
@@ -980,7 +894,6 @@ footer p{
   display:flex;
   flex-direction:column;
   gap:5px;
-  border-radius:12px;
 }
 
 .product-item img{
@@ -988,7 +901,6 @@ footer p{
   height:130px;
   object-fit:cover;
   margin-bottom:8px;
-  border-radius:8px;
 }
 
 .product-item strong{
@@ -1005,8 +917,6 @@ footer p{
 
 .company-admin-list{
   border:1px solid var(--line);
-  border-radius:12px;
-  overflow:hidden;
 }
 
 .company-admin-item{
@@ -1042,7 +952,7 @@ footer p{
 
 
 /* =========================================================
-   TABLET
+   RESPONSIVE
 ========================================================= */
 
 @media(max-width:900px){
@@ -1062,25 +972,6 @@ footer p{
     grid-template-columns:1fr;
   }
 
-  .hero .copy{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .hero .copy .kicker,
-  .hero .copy h1,
-  .hero .copy p,
-  .hero .copy .buttons{
-    width:auto;
-    margin-left:0;
-  }
-
-  .hero .copy p{
-    margin-bottom:30px;
-    font-size:16px;
-  }
-
   .heroimg{
     min-height:390px;
   }
@@ -1093,31 +984,28 @@ footer p{
     height:320px;
   }
 
+  .head{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
   footer{
     grid-template-columns:1fr 1fr;
+  }
+
+  .portal{
+    padding:20px;
+  }
+
+  .portal-box{
+    height:calc(100vh - 40px);
+    padding:30px 25px;
   }
 
 }
 
 
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media(max-width:700px){
-
-  .portal{
-    padding:12px;
-    align-items:center;
-  }
-
-  .portal-box{
-    width:calc(100vw - 24px);
-    height:calc(100vh - 24px);
-    max-height:calc(100vh - 24px);
-    padding:22px 15px;
-    border-radius:18px;
-  }
 
   .dash-grid,
   .admin-grid{
@@ -1128,8 +1016,13 @@ footer p{
     grid-column:auto;
   }
 
+  .portal-box{
+    padding:25px 18px;
+  }
+
   .account-btn{
-    padding:8px 10px;
+    height:38px;
+    padding:0 10px;
     font-size:9px;
   }
 
@@ -1155,10 +1048,6 @@ footer p{
 
 }
 
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
 
 @media(max-width:560px){
 
@@ -1188,10 +1077,6 @@ footer p{
 
   .copy{
     padding:65px 7%;
-  }
-
-  .trust{
-    display:none;
   }
 
   .section{
@@ -1240,15 +1125,12 @@ footer p{
   }
 
   .portal-box{
-    width:calc(100vw - 20px);
     height:calc(100vh - 20px);
-    max-height:calc(100vh - 20px);
-    padding:20px 12px;
-    border-radius:16px;
+    padding:25px 15px;
   }
 
   .login-wrap{
-    margin:35px auto;
+    margin:25px auto;
     padding:25px;
   }
 
