@@ -117,7 +117,8 @@ button:disabled{
   gap:10px;
 }
 
-/* MY ACCOUNT now matches ENQUIRE */
+
+/* MY ACCOUNT */
 
 .account-btn{
   height:36px;
@@ -132,6 +133,9 @@ button:disabled{
   align-items:center;
   justify-content:center;
 }
+
+
+/* ENQUIRE */
 
 .nav-enquire{
   height:36px;
@@ -270,8 +274,7 @@ button:disabled{
 
 
 /* =========================================================
-   TRUST
-   HIDDEN
+   TRUST SECTION REMOVED
 ========================================================= */
 
 .trust{
@@ -286,6 +289,9 @@ button:disabled{
 .section{
   padding:85px 5%;
 }
+
+
+/* LEFT / RIGHT HEADINGS */
 
 .head{
   display:grid;
@@ -631,7 +637,7 @@ footer p{
 
 
 /* =========================================================
-   CUSTOMER / ADMIN PORTAL
+   PORTAL
 ========================================================= */
 
 .portal{
@@ -987,11 +993,6 @@ footer p{
     grid-template-columns:1fr 1fr;
   }
 
-  .head{
-    grid-template-columns:1fr 1fr;
-    gap:25px;
-  }
-
 }
 
 
@@ -1008,7 +1009,6 @@ footer p{
 
   .portal{
     padding:15px;
-    align-items:center;
   }
 
   .portal-box{
@@ -1079,6 +1079,10 @@ footer p{
     padding:62px 6%;
   }
 
+  /*
+    On phones the two columns become one column.
+  */
+
   .head{
     display:block;
   }
@@ -1139,147 +1143,4 @@ footer p{
   }
 
 }
-```css
-/* =========================================================
-   FINAL DESIGN ADJUSTMENTS
-========================================================= */
-
-/* MY ACCOUNT matches the ENQUIRE button */
-
-.account-btn{
-  height:36px;
-  padding:0 15px;
-  border:1px solid var(--gold);
-  background:white;
-  color:var(--navy);
-  font-size:10px;
-  font-weight:bold;
-  letter-spacing:1px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-
-/* =========================================================
-   CORPORATE SECTION
-   Heading left / description right
-========================================================= */
-
-#corporate .head{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:35px;
-  margin-bottom:35px;
-}
-
-#corporate .head > div{
-  max-width:520px;
-}
-
-#corporate .head p{
-  max-width:520px;
-  margin:0;
-}
-
-
-/* =========================================================
-   HIDE THE THREE TRUST BOXES
-========================================================= */
-
-.trust{
-  display:none;
-}
-
-
-/* =========================================================
-   ACCOUNT PORTAL
-   Keep the entire window visible on screen and
-   allow scrolling INSIDE the portal
-========================================================= */
-
-.portal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(16,28,48,.72);
-  z-index:100;
-  padding:30px;
-  overflow:auto;
-  align-items:center;
-  justify-content:center;
-}
-
-.portal.show{
-  display:flex;
-}
-
-.portal-box{
-  width:100%;
-  max-width:1100px;
-  max-height:calc(100vh - 60px);
-  margin:auto;
-  background:var(--cream);
-  padding:35px;
-  position:relative;
-  overflow-y:auto;
-  overflow-x:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width:900px){
-
-  #corporate .head{
-    grid-template-columns:1fr 1fr;
-    gap:25px;
-  }
-
-}
-
-
-@media(max-width:700px){
-
-  .portal{
-    padding:15px;
-  }
-
-  .portal-box{
-    max-height:calc(100vh - 30px);
-    padding:25px 18px;
-  }
-
-}
-
-
-@media(max-width:560px){
-
-  #corporate .head{
-    display:block;
-  }
-
-  #corporate .head h2{
-    margin-bottom:18px;
-  }
-
-  #corporate .head p{
-    max-width:100%;
-  }
-
-  .portal{
-    padding:8px;
-  }
-
-  .portal-box{
-    max-height:calc(100vh - 16px);
-    padding:22px 14px;
-  }
-
-}
 ```
-
