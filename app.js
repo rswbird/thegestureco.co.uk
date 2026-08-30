@@ -48,6 +48,7 @@ function closePortal() {
 
 function closeMobileMenu() {
   mobileMenu.classList.remove("open");
+  $("menuButton").setAttribute("aria-expanded", "false");
 }
 
 
@@ -111,7 +112,8 @@ function escapeHtml(value) {
 
 $("menuButton").addEventListener("click", () => {
 
-  mobileMenu.classList.toggle("open");
+  const isOpen = mobileMenu.classList.toggle("open");
+  $("menuButton").setAttribute("aria-expanded", String(isOpen));
 
 });
 
@@ -1540,6 +1542,45 @@ document.addEventListener("keydown", event => {
 /* =========================================================
    STARTUP
 ========================================================= */
+
+/* =========================================================
+   NEW: SCROLL REVEAL
+   (additive only — does not touch any existing logic above)
+========================================================= */
+
+(function initScrollReveal() {
+
+  const revealEls = document.querySelectorAll("[data-reveal]");
+
+  if (!revealEls.length) {
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) {
+    revealEls.forEach(el => el.classList.add("is-visible"));
+    return;
+  }
+
+  const io = new IntersectionObserver((entries) => {
+
+    entries.forEach(entry => {
+
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        io.unobserve(entry.target);
+      }
+
+    });
+
+  }, {
+    threshold: 0.12,
+    rootMargin: "0px 0px -40px 0px"
+  });
+
+  revealEls.forEach(el => io.observe(el));
+
+})();
+
 
 console.log(
   "The Gesture Co. website loaded successfully."
