@@ -1,58 +1,45 @@
 ```js
 /*
   =========================================================
-  THE GESTURE CO. — SUPABASE CLIENT
+  SUPABASE CLIENT
   =========================================================
 
-  This file creates the Supabase client used by app.js.
-
-  IMPORTANT:
-  - The URL below is your Supabase PROJECT URL.
-  - The publishable key is safe to use in browser code.
-  - NEVER put a Supabase secret/service-role key in this file.
-  - Database security must be enforced using Supabase RLS policies.
-
-  Supabase Project:
+  The Gesture Co.
+  Supabase project:
   https://njayikstvcernrnwqsci.supabase.co
-*/
 
+  This file is imported by app.js.
+*/
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 
 /* =========================================================
-   SUPABASE PROJECT CONFIGURATION
+   SUPABASE PROJECT
 ========================================================= */
 
 const SUPABASE_URL =
   "https://njayikstvcernrnwqsci.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
+const SUPABASE_ANON_KEY =
   "sb_publishable_2dhn7tdbB6fjiGZ-sSyy1w_JXGaokvO";
 
 
 /* =========================================================
-   CREATE SUPABASE CLIENT
+   CREATE CLIENT
 ========================================================= */
 
 export const supabase = createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY,
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
-  }
+  SUPABASE_ANON_KEY
 );
 
 
 /* =========================================================
-   OPTIONAL DEVELOPMENT CHECK
+   CONFIRM CONNECTION
 ========================================================= */
 
 console.log(
-  "[The Gesture Co.] Supabase client initialised."
+  "[The Gesture Co.] Supabase client loaded successfully."
 );
 ```
