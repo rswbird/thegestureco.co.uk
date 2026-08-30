@@ -1,6 +1,5 @@
 import { supabase } from "./supabase.js";
 
-
 /* =========================================================
    GLOBAL STATE
 ========================================================= */
@@ -8,11 +7,12 @@ import { supabase } from "./supabase.js";
 let currentUser = null;
 let currentProfile = null;
 let currentCompany = null;
+let currentMembership = null;
 let authMode = "login";
 
 
 /* =========================================================
-   BASIC UI
+   HELPERS
 ========================================================= */
 
 const $ = (id) => document.getElementById(id);
@@ -23,17 +23,30 @@ const mobileMenu = $("mobileMenu");
 
 
 function openModal() {
+  if (!modal) return;
+
   modal.classList.add("open");
+
+  document.body.style.overflow = "hidden";
 }
 
 
 function closeModal() {
+  if (!modal) return;
+
   modal.classList.remove("open");
+
+  if (!portal?.classList.contains("show")) {
+    document.body.style.overflow = "";
+  }
 }
 
 
 function openPortal() {
+  if (!portal) return;
+
   portal.classList.add("show");
+
   document.body.style.overflow = "hidden";
 
   checkCurrentUser();
@@ -41,22 +54,35 @@ function openPortal() {
 
 
 function closePortal() {
+  if (!portal) return;
+
   portal.classList.remove("show");
-  document.body.style.overflow = "";
+
+  if (!modal?.classList.contains("open")) {
+    document.body.style.overflow = "";
+  }
 }
 
 
 function closeMobileMenu() {
+  if (!mobileMenu) return;
+
   mobileMenu.classList.remove("open");
-  $("menuButton").setAttribute("aria-expanded", "false");
+
+  $("menuButton")?.setAttribute(
+    "aria-expanded",
+    "false"
+  );
 }
 
 
 function showPanel(id) {
 
-  document.querySelectorAll(".portal-panel").forEach(panel => {
-    panel.classList.remove("active");
-  });
+  document
+    .querySelectorAll(".portal-panel")
+    .forEach(panel => {
+      panel.classList.remove("active");
+    });
 
   const panel = $(id);
 
@@ -83,17 +109,26 @@ function formatDate(value) {
     return "—";
   }
 
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric"
-  }).format(new Date(value));
+  }).format(date);
 }
 
 
 function escapeHtml(value) {
 
-  if (value === null || value === undefined) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
     return "";
   }
 
@@ -110,27 +145,44 @@ function escapeHtml(value) {
    MOBILE MENU
 ========================================================= */
 
-$("menuButton").addEventListener("click", () => {
+$("menuButton")?.addEventListener(
+  "click",
+  () => {
 
-  const isOpen = mobileMenu.classList.toggle("open");
-  $("menuButton").setAttribute("aria-expanded", String(isOpen));
+    const isOpen =
+      mobileMenu.classList.toggle("open");
 
-});
+    $("menuButton").setAttribute(
+      "aria-expanded",
+      String(isOpen)
+    );
+
+  }
+);
 
 
-document.querySelectorAll(".mobile-menu a").forEach(link => {
+document
+  .querySelectorAll(".mobile-menu a")
+  .forEach(link => {
 
-  link.addEventListener("click", closeMobileMenu);
+    link.addEventListener(
+      "click",
+      closeMobileMenu
+    );
 
-});
+  });
 
 
-$("mobileEnquire").addEventListener("click", () => {
+$("mobileEnquire")?.addEventListener(
+  "click",
+  () => {
 
-  closeMobileMenu();
-  openModal();
+    closeMobileMenu();
 
-});
+    openModal();
+
+  }
+);
 
 
 /* =========================================================
@@ -150,242 +202,312 @@ $("mobileEnquire").addEventListener("click", () => {
   const button = $(id);
 
   if (button) {
-    button.addEventListener("click", openModal);
+    button.addEventListener(
+      "click",
+      openModal
+    );
   }
 
 });
 
 
-$("closeModal").addEventListener("click", closeModal);
+$("closeModal")?.addEventListener(
+  "click",
+  closeModal
+);
 
 
-modal.addEventListener("click", event => {
+modal?.addEventListener(
+  "click",
+  event => {
 
-  if (event.target === modal) {
-    closeModal();
+    if (event.target === modal) {
+      closeModal();
+    }
+
   }
-
-});
+);
 
 
 /* =========================================================
    ENQUIRY FORM
 ========================================================= */
 
-$("enquiryForm").addEventListener("submit", async event => {
+$("enquiryForm")?.addEventListener(
+  "submit",
+  async event => {
 
-  event.preventDefault();
+    event.preventDefault();
 
-  const form = event.currentTarget;
-  const button = $("enquirySubmit");
+    const button = $("enquirySubmit");
 
-  button.disabled = true;
-  button.textContent = "SENDING...";
+    button.disabled = true;
+    button.textContent = "SENDING...";
 
-  $("error").style.display = "none";
+    $("error").style.display = "none";
 
-  const formData = {
+    const formData = {
 
-    name: $("name").value.trim(),
+      name:
+        $("name").value.trim(),
 
-    email: $("email").value.trim(),
+      email:
+        $("email").value.trim(),
 
-    company: $("company").value.trim(),
+      company:
+        $("company").value.trim(),
 
-    enquiry_type: $("enquiry_type").value,
+      enquiry_type:
+        $("enquiry_type").value,
 
-    quantity: $("quantity").value || null,
+      quantity:
+        $("quantity").value
+          ? Number($("quantity").value)
+          : null,
 
-    budget: $("budget").value.trim(),
+      budget:
+        $("budget").value.trim(),
 
-    timeline: $("timeline").value || null,
+      timeline:
+        $("timeline").value || null,
 
-    phone: $("phone").value.trim(),
+      phone:
+        $("phone").value.trim(),
 
-    message: $("message").value.trim()
+      message:
+        $("message").value.trim()
 
-  };
+    };
 
 
-  try {
+    try {
 
-    /*
-      This uses a Supabase Edge Function if one exists.
+      const {
+        error
+      } = await supabase.functions.invoke(
+        "submit-enquiry",
+        {
+          body: formData
+        }
+      );
 
-      If you haven't created the function yet, the form will
-      display an error rather than silently pretending it worked.
-    */
 
-    const { data, error } = await supabase.functions.invoke(
-      "submit-enquiry",
-      {
-        body: formData
+      if (error) {
+        throw error;
       }
-    );
 
 
-    if (error) {
-      throw error;
+      $("enquiryForm").style.display =
+        "none";
+
+      $("success").style.display =
+        "block";
+
+
+    } catch (error) {
+
+      console.error(
+        "Enquiry error:",
+        error
+      );
+
+      $("error").style.display =
+        "block";
+
+      button.disabled = false;
+
+      button.textContent =
+        "SEND ENQUIRY";
+
     }
 
-
-    $("enquiryForm").style.display = "none";
-
-    $("success").style.display = "block";
-
-
-  } catch (error) {
-
-    console.error("Enquiry error:", error);
-
-    $("error").style.display = "block";
-
-    button.disabled = false;
-
-    button.textContent = "SEND ENQUIRY";
-
   }
-
-});
+);
 
 
 /* =========================================================
    AUTH MODE
 ========================================================= */
 
-$("toggleAuth").addEventListener("click", () => {
+$("toggleAuth")?.addEventListener(
+  "click",
+  () => {
 
-  if (authMode === "login") {
+    if (authMode === "login") {
 
-    authMode = "signup";
+      authMode = "signup";
 
-    $("authTitle").textContent = "Create your account.";
+      $("authTitle").textContent =
+        "Create your account.";
 
-    $("authSubtitle").textContent =
-      "Create an account to manage your company, orders and documents.";
+      $("authSubtitle").textContent =
+        "Create an account to manage your company, orders and documents.";
 
-    $("authSubmit").textContent = "CREATE ACCOUNT";
+      $("authSubmit").textContent =
+        "CREATE ACCOUNT";
 
-    $("toggleAuth").textContent =
-      "Already have an account? Sign in";
+      $("toggleAuth").textContent =
+        "Already have an account? Sign in";
 
-    $("signupNameField").classList.remove("hidden");
+      $("signupNameField")
+        .classList
+        .remove("hidden");
 
-  } else {
+    } else {
 
-    authMode = "login";
+      authMode = "login";
 
-    $("authTitle").textContent = "Welcome back.";
+      $("authTitle").textContent =
+        "Welcome back.";
 
-    $("authSubtitle").textContent =
-      "Sign in to manage your company, orders and documents.";
+      $("authSubtitle").textContent =
+        "Sign in to manage your company, orders and documents.";
 
-    $("authSubmit").textContent = "SIGN IN";
+      $("authSubmit").textContent =
+        "SIGN IN";
 
-    $("toggleAuth").textContent =
-      "Need an account? Create one";
+      $("toggleAuth").textContent =
+        "Need an account? Create one";
 
-    $("signupNameField").classList.add("hidden");
+      $("signupNameField")
+        .classList
+        .add("hidden");
+
+    }
 
   }
-
-});
+);
 
 
 /* =========================================================
    AUTH FORM
 ========================================================= */
 
-$("authForm").addEventListener("submit", async event => {
+$("authForm")?.addEventListener(
+  "submit",
+  async event => {
 
-  event.preventDefault();
+    event.preventDefault();
 
-  const email = $("authEmail").value.trim();
+    const email =
+      $("authEmail").value.trim();
 
-  const password = $("authPassword").value;
+    const password =
+      $("authPassword").value;
 
-  const fullName = $("signupName").value.trim();
+    const fullName =
+      $("signupName").value.trim();
 
-  const button = $("authSubmit");
+    const button =
+      $("authSubmit");
 
-  const message = $("authMessage");
-
-  button.disabled = true;
-
-  message.textContent = "";
-
-  try {
-
-    if (authMode === "login") {
-
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      currentUser = data.user;
-
-      await loadUser();
-
-    } else {
-
-      const { data, error } =
-        await supabase.auth.signUp({
-
-          email,
-
-          password,
-
-          options: {
-            data: {
-              full_name: fullName
-            }
-          }
-
-        });
-
-      if (error) {
-        throw error;
-      }
+    const message =
+      $("authMessage");
 
 
-      if (!data.session) {
+    button.disabled = true;
 
-        message.className = "auth-message success-message";
+    message.textContent = "";
 
-        message.textContent =
-          "Account created. Please check your email to confirm your account before signing in.";
 
-      } else {
+    try {
 
-        currentUser = data.user;
+      /* LOGIN */
+
+      if (authMode === "login") {
+
+        const {
+          data,
+          error
+        } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        currentUser =
+          data.user;
+
 
         await loadUser();
 
       }
 
+
+      /* SIGN UP */
+
+      else {
+
+        const {
+          data,
+          error
+        } =
+          await supabase.auth.signUp({
+
+            email,
+
+            password,
+
+            options: {
+              data: {
+                full_name:
+                  fullName
+              }
+            }
+
+          });
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        if (!data.session) {
+
+          message.className =
+            "auth-message success-message";
+
+          message.textContent =
+            "Account created. Please check your email to confirm your account before signing in.";
+
+        } else {
+
+          currentUser =
+            data.user;
+
+          await loadUser();
+
+        }
+
+      }
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      message.className =
+        "auth-message error-message";
+
+      message.textContent =
+        error.message ||
+        "Something went wrong.";
+
+    } finally {
+
+      button.disabled = false;
+
     }
 
-  } catch (error) {
-
-    console.error(error);
-
-    message.className = "auth-message error-message";
-
-    message.textContent = error.message || "Something went wrong.";
-
-  } finally {
-
-    button.disabled = false;
-
   }
-
-});
+);
 
 
 /* =========================================================
@@ -394,20 +516,39 @@ $("authForm").addEventListener("submit", async event => {
 
 async function checkCurrentUser() {
 
-  const {
-    data: {
-      session
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabase.auth.getSession();
+
+
+    if (error) {
+      throw error;
     }
-  } = await supabase.auth.getSession();
 
 
-  if (session?.user) {
+    if (data.session?.user) {
 
-    currentUser = session.user;
+      currentUser =
+        data.session.user;
 
-    await loadUser();
+      await loadUser();
 
-  } else {
+    } else {
+
+      showPanel("authPanel");
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Session error:",
+      error
+    );
 
     showPanel("authPanel");
 
@@ -430,16 +571,26 @@ async function loadUser() {
   const {
     data: profile,
     error
-  } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", currentUser.id)
-    .maybeSingle();
+  } =
+    await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .maybeSingle();
 
 
   if (error) {
 
-    console.error("Profile error:", error);
+    console.error(
+      "Profile error:",
+      error
+    );
+
+    $("authMessage").className =
+      "auth-message error-message";
+
+    $("authMessage").textContent =
+      "Your account exists, but your profile could not be loaded.";
 
     showPanel("authPanel");
 
@@ -448,7 +599,8 @@ async function loadUser() {
   }
 
 
-  currentProfile = profile;
+  currentProfile =
+    profile;
 
 
   if (profile?.is_admin === true) {
@@ -475,39 +627,55 @@ async function loadUser() {
 async function loadCustomerPortal() {
 
   $("customerWelcome").textContent =
-    `Welcome${currentProfile?.full_name ? ", " + currentProfile.full_name : ""}.`;
+    `Welcome${
+      currentProfile?.full_name
+        ? ", " + currentProfile.full_name
+        : ""
+    }.`;
+
+  currentCompany = null;
+  currentMembership = null;
 
 
   const {
     data: membership,
     error
-  } = await supabase
-    .from("company_members")
-    .select(`
-      id,
-      company_id,
-      role,
-      companies (
+  } =
+    await supabase
+      .from("company_members")
+      .select(`
         id,
-        name,
-        contact_email,
-        phone,
-        address_line_1,
-        address_line_2,
-        city,
-        postcode
+        company_id,
+        role,
+        companies (
+          id,
+          name,
+          contact_email,
+          phone,
+          address_line_1,
+          address_line_2,
+          city,
+          postcode
+        )
+      `)
+      .eq(
+        "user_id",
+        currentUser.id
       )
-    `)
-    .eq("user_id", currentUser.id)
-    .maybeSingle();
+      .maybeSingle();
 
 
   if (error) {
 
-    console.error("Company membership error:", error);
+    console.error(
+      "Company membership error:",
+      error
+    );
 
     $("companyDetails").innerHTML =
-      `<div class="error-message">Unable to load your company details.</div>`;
+      `<div class="error-message">
+        Unable to load your company details.
+      </div>`;
 
     return;
 
@@ -523,36 +691,69 @@ async function loadCustomerPortal() {
       </div>
     `;
 
-    $("activeOrders").textContent = "0";
-    $("totalOrders").textContent = "0";
-    $("teamUsers").textContent = "0";
+    $("activeOrders").textContent =
+      "0";
+
+    $("totalOrders").textContent =
+      "0";
+
+    $("teamUsers").textContent =
+      "0";
+
+    $("ordersBody").innerHTML = "";
+
+    $("teamList").innerHTML = "";
 
     return;
 
   }
 
 
-  currentCompany = membership.companies;
+  currentMembership =
+    membership;
+
+  currentCompany =
+    membership.companies;
+
+
+  if (!currentCompany) {
+
+    $("companyDetails").innerHTML =
+      `<div class="error-message">
+        Your company could not be found.
+      </div>`;
+
+    return;
+
+  }
 
 
   $("companyDetails").innerHTML = `
 
     <div>
 
-      <span class="small-label">COMPANY</span>
+      <span class="small-label">
+        COMPANY
+      </span>
 
       <strong>
-        ${escapeHtml(currentCompany.name)}
+        ${escapeHtml(
+          currentCompany.name
+        )}
       </strong>
 
     </div>
 
     <div>
 
-      <span class="small-label">ROLE</span>
+      <span class="small-label">
+        ROLE
+      </span>
 
       <strong>
-        ${escapeHtml(membership.role || "Member")}
+        ${escapeHtml(
+          membership.role || "Member"
+        )}
       </strong>
 
     </div>
@@ -581,42 +782,52 @@ async function loadCustomerOrders() {
   const {
     data: orders,
     error
-  } = await supabase
-    .from("orders")
-    .select(`
-      id,
-      order_number,
-      company_id,
-      status,
-      total_amount,
-      created_at,
-      updated_at,
-      invoices (
+  } =
+    await supabase
+      .from("orders")
+      .select(`
         id,
-        invoice_number,
-        file_path,
-        amount,
-        issued_at
-      ),
-      shipments (
-        id,
-        courier,
-        tracking_number,
-        tracking_url,
+        order_number,
+        company_id,
         status,
-        estimated_delivery,
-        delivered_at
+        total_amount,
+        created_at,
+        updated_at,
+        invoices (
+          id,
+          invoice_number,
+          file_path,
+          amount,
+          issued_at
+        ),
+        shipments (
+          id,
+          courier,
+          tracking_number,
+          tracking_url,
+          status,
+          estimated_delivery,
+          delivered_at
+        )
+      `)
+      .eq(
+        "company_id",
+        currentCompany.id
       )
-    `)
-    .eq("company_id", currentCompany.id)
-    .order("created_at", {
-      ascending: false
-    });
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
 
-    console.error("Orders error:", error);
+    console.error(
+      "Orders error:",
+      error
+    );
 
     $("ordersBody").innerHTML = `
       <tr>
@@ -631,27 +842,34 @@ async function loadCustomerOrders() {
   }
 
 
-  const orderList = orders || [];
+  const orderList =
+    orders || [];
 
 
-  $("totalOrders").textContent = orderList.length;
+  $("totalOrders").textContent =
+    orderList.length;
 
 
-  const active = orderList.filter(order => {
+  const active =
+    orderList.filter(order => {
 
-    const status = String(order.status || "").toLowerCase();
+      const status =
+        String(
+          order.status || ""
+        ).toLowerCase();
 
-    return ![
-      "delivered",
-      "cancelled",
-      "complete",
-      "completed"
-    ].includes(status);
+      return ![
+        "delivered",
+        "cancelled",
+        "complete",
+        "completed"
+      ].includes(status);
 
-  });
+    });
 
 
-  $("activeOrders").textContent = active.length;
+  $("activeOrders").textContent =
+    active.length;
 
 
   if (!orderList.length) {
@@ -669,100 +887,133 @@ async function loadCustomerOrders() {
   }
 
 
-  $("ordersBody").innerHTML = orderList.map(order => {
+  $("ordersBody").innerHTML =
+    orderList.map(order => {
 
-    const shipment = Array.isArray(order.shipments)
-      ? order.shipments[0]
-      : order.shipments;
-
-    const invoice = Array.isArray(order.invoices)
-      ? order.invoices[0]
-      : order.invoices;
+      const shipment =
+        Array.isArray(order.shipments)
+          ? order.shipments[0]
+          : order.shipments;
 
 
-    let delivery = "—";
+      const invoice =
+        Array.isArray(order.invoices)
+          ? order.invoices[0]
+          : order.invoices;
 
 
-    if (shipment?.delivered_at) {
+      let delivery = "—";
 
-      delivery = `Delivered ${formatDate(shipment.delivered_at)}`;
 
-    } else if (shipment?.estimated_delivery) {
+      if (shipment?.delivered_at) {
 
-      delivery = `Expected ${formatDate(shipment.estimated_delivery)}`;
+        delivery =
+          `Delivered ${formatDate(
+            shipment.delivered_at
+          )}`;
 
-    } else if (shipment?.tracking_url) {
+      } else if (
+        shipment?.estimated_delivery
+      ) {
 
-      delivery = `
-        <a class="tracking-link"
-           href="${escapeHtml(shipment.tracking_url)}"
-           target="_blank"
-           rel="noopener">
-           TRACK DELIVERY
-        </a>
+        delivery =
+          `Expected ${formatDate(
+            shipment.estimated_delivery
+          )}`;
+
+      } else if (
+        shipment?.tracking_url
+      ) {
+
+        delivery = `
+          <a
+            class="tracking-link"
+            href="${escapeHtml(
+              shipment.tracking_url
+            )}"
+            target="_blank"
+            rel="noopener">
+            TRACK DELIVERY
+          </a>
+        `;
+
+      }
+
+
+      let invoiceHtml = "—";
+
+
+      if (invoice?.file_path) {
+
+        invoiceHtml = `
+          <button
+            class="btn small"
+            data-invoice="${escapeHtml(
+              invoice.file_path
+            )}">
+            DOWNLOAD
+          </button>
+        `;
+
+      }
+
+
+      return `
+
+        <tr>
+
+          <td>
+            #TG-${escapeHtml(
+              order.order_number
+            )}
+          </td>
+
+          <td>
+            <span class="status">
+              ${escapeHtml(
+                order.status ||
+                "Processing"
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${money(
+              order.total_amount
+            )}
+          </td>
+
+          <td>
+            ${delivery}
+          </td>
+
+          <td>
+            ${invoiceHtml}
+          </td>
+
+        </tr>
+
       `;
 
-    }
+    }).join("");
 
 
-    let invoiceHtml = "—";
+  document
+    .querySelectorAll("[data-invoice]")
+    .forEach(button => {
 
+      button.addEventListener(
+        "click",
+        () => {
 
-    if (invoice?.file_path) {
+          downloadInvoice(
+            button.dataset.invoice
+          );
 
-      invoiceHtml = `
-        <button
-          class="btn small"
-          data-invoice="${escapeHtml(invoice.file_path)}">
-          DOWNLOAD
-        </button>
-      `;
-
-    }
-
-
-    return `
-
-      <tr>
-
-        <td>
-          #TG-${escapeHtml(order.order_number)}
-        </td>
-
-        <td>
-          <span class="status">
-            ${escapeHtml(order.status || "Processing")}
-          </span>
-        </td>
-
-        <td>
-          ${money(order.total_amount)}
-        </td>
-
-        <td>
-          ${delivery}
-        </td>
-
-        <td>
-          ${invoiceHtml}
-        </td>
-
-      </tr>
-
-    `;
-
-  }).join("");
-
-
-  document.querySelectorAll("[data-invoice]").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-      downloadInvoice(button.dataset.invoice);
+        }
+      );
 
     });
-
-  });
 
 }
 
@@ -771,7 +1022,9 @@ async function loadCustomerOrders() {
    INVOICE DOWNLOAD
 ========================================================= */
 
-async function downloadInvoice(filePath) {
+async function downloadInvoice(
+  filePath
+) {
 
   if (!filePath) {
     return;
@@ -780,18 +1033,17 @@ async function downloadInvoice(filePath) {
 
   try {
 
-    /*
-      This assumes invoices are stored in a Supabase Storage
-      bucket called "invoices".
-    */
-
     const {
       data,
       error
-    } = await supabase
-      .storage
-      .from("invoices")
-      .createSignedUrl(filePath, 300);
+    } =
+      await supabase
+        .storage
+        .from("invoices")
+        .createSignedUrl(
+          filePath,
+          300
+        );
 
 
     if (error) {
@@ -808,7 +1060,10 @@ async function downloadInvoice(filePath) {
 
   } catch (error) {
 
-    console.error("Invoice error:", error);
+    console.error(
+      "Invoice error:",
+      error
+    );
 
     alert(
       "We couldn't open the invoice. Please contact The Gesture Co."
@@ -833,37 +1088,48 @@ async function loadCompanyTeam() {
   const {
     data: members,
     error
-  } = await supabase
-    .from("company_members")
-    .select(`
-      id,
-      user_id,
-      role,
-      created_at,
-      profiles (
-        full_name,
-        email
-      )
-    `)
-    .eq("company_id", currentCompany.id);
+  } =
+    await supabase
+      .from("company_members")
+      .select(`
+        id,
+        user_id,
+        role,
+        created_at,
+        profiles (
+          full_name,
+          email
+        )
+      `)
+      .eq(
+        "company_id",
+        currentCompany.id
+      );
 
 
   if (error) {
 
-    console.error("Team error:", error);
+    console.error(
+      "Team error:",
+      error
+    );
 
     $("teamList").innerHTML =
-      `<div class="error-message">Unable to load team.</div>`;
+      `<div class="error-message">
+        Unable to load team.
+      </div>`;
 
     return;
 
   }
 
 
-  const list = members || [];
+  const list =
+    members || [];
 
 
-  $("teamUsers").textContent = list.length;
+  $("teamUsers").textContent =
+    list.length;
 
 
   if (!list.length) {
@@ -876,38 +1142,50 @@ async function loadCompanyTeam() {
   }
 
 
-  $("teamList").innerHTML = list.map(member => {
+  $("teamList").innerHTML =
+    list.map(member => {
 
-    const profile = Array.isArray(member.profiles)
-      ? member.profiles[0]
-      : member.profiles;
+      const profile =
+        Array.isArray(
+          member.profiles
+        )
+          ? member.profiles[0]
+          : member.profiles;
 
 
-    return `
+      return `
 
-      <div class="team-member">
+        <div class="team-member">
 
-        <div>
+          <div>
 
-          <strong>
-            ${escapeHtml(profile?.full_name || "Team member")}
-          </strong>
+            <strong>
+              ${escapeHtml(
+                profile?.full_name ||
+                "Team member"
+              )}
+            </strong>
 
-          <span>
-            ${escapeHtml(profile?.email || "")}
-          </span>
+            <span>
+              ${escapeHtml(
+                profile?.email || ""
+              )}
+            </span>
+
+          </div>
+
+          <small>
+            ${escapeHtml(
+              member.role ||
+              "Member"
+            )}
+          </small>
 
         </div>
 
-        <small>
-          ${escapeHtml(member.role || "Member")}
-        </small>
+      `;
 
-      </div>
-
-    `;
-
-  }).join("");
+    }).join("");
 
 }
 
@@ -916,76 +1194,101 @@ async function loadCompanyTeam() {
    EMPLOYEE INVITATIONS
 ========================================================= */
 
-$("inviteButton").addEventListener("click", async () => {
+$("inviteButton")?.addEventListener(
+  "click",
+  async () => {
 
-  const email = $("inviteEmail").value.trim();
-
-  if (!email) {
-
-    $("inviteMessage").innerHTML =
-      `<div class="error-message">Please enter an email address.</div>`;
-
-    return;
-
-  }
+    const email =
+      $("inviteEmail")
+        .value
+        .trim();
 
 
-  /*
-    The actual invitation requires an Edge Function because
-    inviting users requires privileged Supabase Auth access.
+    if (!email) {
 
-    This calls a function named "invite-company-member".
-  */
+      $("inviteMessage").innerHTML =
+        `<div class="error-message">
+          Please enter an email address.
+        </div>`;
 
-  try {
+      return;
 
-    $("inviteButton").disabled = true;
-
-    $("inviteButton").textContent = "SENDING...";
-
-
-    const {
-      error
-    } = await supabase.functions.invoke(
-      "invite-company-member",
-      {
-        body: {
-          email,
-          company_id: currentCompany?.id
-        }
-      }
-    );
-
-
-    if (error) {
-      throw error;
     }
 
 
-    $("inviteMessage").innerHTML =
-      `<div class="success-message">Invitation sent successfully.</div>`;
+    if (!currentCompany?.id) {
 
-    $("inviteEmail").value = "";
+      $("inviteMessage").innerHTML =
+        `<div class="error-message">
+          Your account is not connected to a company.
+        </div>`;
+
+      return;
+
+    }
 
 
-  } catch (error) {
+    try {
 
-    console.error(error);
+      $("inviteButton").disabled =
+        true;
 
-    $("inviteMessage").innerHTML =
-      `<div class="error-message">
-        We couldn't send the invitation yet. Please try again later.
-      </div>`;
+      $("inviteButton").textContent =
+        "SENDING...";
 
-  } finally {
 
-    $("inviteButton").disabled = false;
+      const {
+        error
+      } =
+        await supabase.functions.invoke(
+          "invite-company-member",
+          {
+            body: {
+              email,
+              company_id:
+                currentCompany.id
+            }
+          }
+        );
 
-    $("inviteButton").textContent = "INVITE EMPLOYEE";
+
+      if (error) {
+        throw error;
+      }
+
+
+      $("inviteMessage").innerHTML =
+        `<div class="success-message">
+          Invitation sent successfully.
+        </div>`;
+
+
+      $("inviteEmail").value =
+        "";
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      $("inviteMessage").innerHTML =
+        `<div class="error-message">
+          We couldn't send the invitation yet.
+          Please try again later.
+        </div>`;
+
+    } finally {
+
+      $("inviteButton").disabled =
+        false;
+
+      $("inviteButton").textContent =
+        "INVITE EMPLOYEE";
+
+    }
 
   }
-
-});
+);
 
 
 /* =========================================================
@@ -994,24 +1297,52 @@ $("inviteButton").addEventListener("click", async () => {
 
 async function logout() {
 
-  await supabase.auth.signOut();
+  try {
+    await supabase.auth.signOut();
+  } catch (error) {
+    console.error(error);
+  }
+
 
   currentUser = null;
   currentProfile = null;
   currentCompany = null;
+  currentMembership = null;
 
   authMode = "login";
 
-  showPanel("authPanel");
 
-  $("authMessage").textContent = "";
+  $("authTitle").textContent =
+    "Welcome back.";
+
+  $("authSubtitle").textContent =
+    "Sign in to manage your company, orders and documents.";
+
+  $("authSubmit").textContent =
+    "SIGN IN";
+
+  $("toggleAuth").textContent =
+    "Need an account? Create one";
+
+  $("signupNameField")
+    ?.classList
+    .add("hidden");
+
+
+  showPanel("authPanel");
 
 }
 
 
-$("customerLogout").addEventListener("click", logout);
+$("customerLogout")?.addEventListener(
+  "click",
+  logout
+);
 
-$("adminLogout").addEventListener("click", logout);
+$("adminLogout")?.addEventListener(
+  "click",
+  logout
+);
 
 
 /* =========================================================
@@ -1038,12 +1369,16 @@ async function loadAdminProducts() {
   const {
     data: products,
     error
-  } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", {
-      ascending: false
-    });
+  } =
+    await supabase
+      .from("products")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -1051,7 +1386,9 @@ async function loadAdminProducts() {
     console.error(error);
 
     $("adminProducts").innerHTML =
-      `<div class="error-message">Unable to load products.</div>`;
+      `<div class="error-message">
+        Unable to load products.
+      </div>`;
 
     return;
 
@@ -1068,61 +1405,97 @@ async function loadAdminProducts() {
   }
 
 
-  $("adminProducts").innerHTML = products.map(product => `
+  $("adminProducts").innerHTML =
+    products.map(product => `
 
-    <div class="product-item">
+      <div class="product-item">
 
-      ${product.image_url
-        ? `<img src="${escapeHtml(product.image_url)}" alt="">`
-        : ""
-      }
+        ${
+          product.image_url
+            ? `
+              <img
+                src="${escapeHtml(
+                  product.image_url
+                )}"
+                alt="${escapeHtml(
+                  product.name
+                )}">
+            `
+            : ""
+        }
 
-      <strong>
-        ${escapeHtml(product.name)}
-      </strong>
+        <strong>
+          ${escapeHtml(
+            product.name
+          )}
+        </strong>
 
-      <span>
-        ${money(product.price)}
-      </span>
+        <span>
+          ${money(
+            product.price
+          )}
+        </span>
 
-      <small>
-        ${escapeHtml(product.category || "Product")}
-      </small>
+        <small>
+          ${escapeHtml(
+            product.category ||
+            "Product"
+          )}
+        </small>
 
-      <small>
-        ${product.active ? "ACTIVE" : "INACTIVE"}
-      </small>
+        <small>
+          ${
+            product.active
+              ? "ACTIVE"
+              : "INACTIVE"
+          }
+        </small>
 
-      <button
-        class="btn small product-toggle"
-        data-product-id="${product.id}"
-        data-active="${product.active}">
-        ${product.active ? "DEACTIVATE" : "ACTIVATE"}
-      </button>
+        <button
+          class="btn small product-toggle"
+          data-product-id="${escapeHtml(
+            product.id
+          )}"
+          data-active="${product.active}">
+          ${
+            product.active
+              ? "DEACTIVATE"
+              : "ACTIVATE"
+          }
+        </button>
 
-    </div>
+      </div>
 
-  `).join("");
-
-
-  document.querySelectorAll(".product-toggle").forEach(button => {
-
-    button.addEventListener("click", async () => {
-
-      const productId = button.dataset.productId;
-
-      const currentlyActive =
-        button.dataset.active === "true";
+    `).join("");
 
 
-      await updateProductStatus(
-        productId,
-        !currentlyActive
+  document
+    .querySelectorAll(
+      ".product-toggle"
+    )
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        async () => {
+
+          const productId =
+            button.dataset.productId;
+
+          const currentlyActive =
+            button.dataset.active ===
+            "true";
+
+
+          await updateProductStatus(
+            productId,
+            !currentlyActive
+          );
+
+        }
       );
 
     });
-
-  });
 
 }
 
@@ -1138,19 +1511,25 @@ async function updateProductStatus(
 
   const {
     error
-  } = await supabase
-    .from("products")
-    .update({
-      active
-    })
-    .eq("id", productId);
+  } =
+    await supabase
+      .from("products")
+      .update({
+        active
+      })
+      .eq(
+        "id",
+        productId
+      );
 
 
   if (error) {
 
     console.error(error);
 
-    alert("Unable to update product.");
+    alert(
+      "Unable to update product."
+    );
 
     return;
 
@@ -1166,147 +1545,196 @@ async function updateProductStatus(
    ADD PRODUCT
 ========================================================= */
 
-$("productForm").addEventListener("submit", async event => {
+$("productForm")?.addEventListener(
+  "submit",
+  async event => {
 
-  event.preventDefault();
-
-
-  const name =
-    $("productName").value.trim();
-
-  const slugInput =
-    $("productSlug").value.trim();
-
-  const slug =
-    slugInput ||
-    name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    event.preventDefault();
 
 
-  const price =
-    Number($("productPrice").value);
-
-  const category =
-    $("productCategory").value;
-
-  const minimumQuantity =
-    Number($("productMinimum").value || 1);
-
-  const description =
-    $("productDescription").value.trim();
-
-  const image =
-    $("productImage").files[0];
+    const name =
+      $("productName")
+        .value
+        .trim();
 
 
-  try {
-
-    $("productMessage").innerHTML =
-      `<div class="notice">Saving product...</div>`;
-
-
-    let imageUrl = null;
+    const slugInput =
+      $("productSlug")
+        .value
+        .trim();
 
 
-    /*
-      If an image is selected, attempt to upload it to a
-      Supabase Storage bucket called "products".
-    */
-
-    if (image) {
-
-      const fileExtension =
-        image.name.split(".").pop();
-
-      const fileName =
-        `${crypto.randomUUID()}.${fileExtension}`;
-
-
-      const {
-        error: uploadError
-      } = await supabase
-        .storage
-        .from("products")
-        .upload(fileName, image, {
-          cacheControl: "3600",
-          upsert: false
-        });
+    const slug =
+      slugInput ||
+      name
+        .toLowerCase()
+        .replace(
+          /[^a-z0-9]+/g,
+          "-"
+        )
+        .replace(
+          /^-|-$/g,
+          ""
+        );
 
 
-      if (uploadError) {
-        throw uploadError;
+    const price =
+      Number(
+        $("productPrice").value
+      );
+
+
+    const category =
+      $("productCategory").value;
+
+
+    const minimumQuantity =
+      Number(
+        $("productMinimum").value ||
+        1
+      );
+
+
+    const description =
+      $("productDescription")
+        .value
+        .trim();
+
+
+    const image =
+      $("productImage")
+        .files[0];
+
+
+    try {
+
+      $("productMessage").innerHTML =
+        `<div class="notice">
+          Saving product...
+        </div>`;
+
+
+      let imageUrl = null;
+
+
+      if (image) {
+
+        const fileExtension =
+          image.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+
+        const fileName =
+          `${crypto.randomUUID()}.${fileExtension}`;
+
+
+        const {
+          error: uploadError
+        } =
+          await supabase
+            .storage
+            .from("products")
+            .upload(
+              fileName,
+              image,
+              {
+                cacheControl:
+                  "3600",
+                upsert: false,
+                contentType:
+                  image.type
+              }
+            );
+
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+
+        const {
+          data: publicUrl
+        } =
+          supabase
+            .storage
+            .from("products")
+            .getPublicUrl(
+              fileName
+            );
+
+
+        imageUrl =
+          publicUrl.publicUrl;
+
       }
 
 
       const {
-        data: publicUrl
-      } = supabase
-        .storage
-        .from("products")
-        .getPublicUrl(fileName);
+        error
+      } =
+        await supabase
+          .from("products")
+          .insert({
+
+            name,
+
+            slug,
+
+            description,
+
+            category,
+
+            price,
+
+            minimum_quantity:
+              minimumQuantity,
+
+            image_url:
+              imageUrl,
+
+            active: true
+
+          });
 
 
-      imageUrl = publicUrl.publicUrl;
+      if (error) {
+        throw error;
+      }
+
+
+      $("productForm").reset();
+
+      $("productMinimum").value =
+        "1";
+
+
+      $("productMessage").innerHTML =
+        `<div class="success-message">
+          Product added successfully.
+        </div>`;
+
+
+      await loadAdminProducts();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      $("productMessage").innerHTML =
+        `<div class="error-message">
+          ${escapeHtml(
+            error.message ||
+            "Unable to save product."
+          )}
+        </div>`;
 
     }
-
-
-    const {
-      error
-    } = await supabase
-      .from("products")
-      .insert({
-
-        name,
-
-        slug,
-
-        description,
-
-        category,
-
-        price,
-
-        minimum_quantity: minimumQuantity,
-
-        image_url: imageUrl,
-
-        active: true
-
-      });
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    $("productForm").reset();
-
-    $("productMinimum").value = "1";
-
-
-    $("productMessage").innerHTML =
-      `<div class="success-message">Product added successfully.</div>`;
-
-
-    await loadAdminProducts();
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    $("productMessage").innerHTML =
-      `<div class="error-message">
-        ${escapeHtml(error.message || "Unable to save product.")}
-      </div>`;
 
   }
-
-});
+);
 
 
 /* =========================================================
@@ -1318,22 +1746,26 @@ async function loadAdminOrders() {
   const {
     data: orders,
     error
-  } = await supabase
-    .from("orders")
-    .select(`
-      id,
-      order_number,
-      status,
-      total_amount,
-      created_at,
-      companies (
-        name
+  } =
+    await supabase
+      .from("orders")
+      .select(`
+        id,
+        order_number,
+        status,
+        total_amount,
+        created_at,
+        companies (
+          name
+        )
+      `)
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
       )
-    `)
-    .order("created_at", {
-      ascending: false
-    })
-    .limit(100);
+      .limit(100);
 
 
   if (error) {
@@ -1354,43 +1786,57 @@ async function loadAdminOrders() {
 
 
   $("adminOrdersBody").innerHTML =
-    (orders || []).map(order => `
+    (orders || [])
+      .map(order => `
 
-      <tr>
+        <tr>
 
-        <td>
-          #TG-${escapeHtml(order.order_number)}
-        </td>
+          <td>
+            #TG-${escapeHtml(
+              order.order_number
+            )}
+          </td>
 
-        <td>
-          ${escapeHtml(order.companies?.name || "—")}
-        </td>
+          <td>
+            ${escapeHtml(
+              order.companies?.name ||
+              "—"
+            )}
+          </td>
 
-        <td>
-          <span class="status">
-            ${escapeHtml(order.status || "Processing")}
-          </span>
-        </td>
+          <td>
+            <span class="status">
+              ${escapeHtml(
+                order.status ||
+                "Processing"
+              )}
+            </span>
+          </td>
 
-        <td>
-          ${money(order.total_amount)}
-        </td>
+          <td>
+            ${money(
+              order.total_amount
+            )}
+          </td>
 
-        <td>
-          ${formatDate(order.created_at)}
-        </td>
+          <td>
+            ${formatDate(
+              order.created_at
+            )}
+          </td>
 
-      </tr>
+        </tr>
 
-    `).join("") || `
+      `)
+      .join("") ||
 
-      <tr>
-        <td colspan="5">
-          No orders yet.
-        </td>
-      </tr>
-
-    `;
+      `
+        <tr>
+          <td colspan="5">
+            No orders yet.
+          </td>
+        </tr>
+      `;
 
 }
 
@@ -1404,20 +1850,24 @@ async function loadAdminCompanies() {
   const {
     data: companies,
     error
-  } = await supabase
-    .from("companies")
-    .select(`
-      id,
-      name,
-      contact_email,
-      phone,
-      city,
-      postcode,
-      created_at
-    `)
-    .order("created_at", {
-      ascending: false
-    });
+  } =
+    await supabase
+      .from("companies")
+      .select(`
+        id,
+        name,
+        contact_email,
+        phone,
+        city,
+        postcode,
+        created_at
+      `)
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
 
 
   if (error) {
@@ -1425,7 +1875,9 @@ async function loadAdminCompanies() {
     console.error(error);
 
     $("adminCompanies").innerHTML =
-      `<div class="error-message">Unable to load companies.</div>`;
+      `<div class="error-message">
+        Unable to load companies.
+      </div>`;
 
     return;
 
@@ -1446,30 +1898,47 @@ async function loadAdminCompanies() {
 
     <div class="company-admin-list">
 
-      ${companies.map(company => `
+      ${
+        companies.map(company => `
 
-        <div class="company-admin-item">
+          <div class="company-admin-item">
 
-          <div>
+            <div>
 
-            <strong>
-              ${escapeHtml(company.name)}
-            </strong>
+              <strong>
+                ${escapeHtml(
+                  company.name
+                )}
+              </strong>
 
-            <span>
-              ${escapeHtml(company.contact_email || "No email")}
-            </span>
+              <span>
+                ${escapeHtml(
+                  company.contact_email ||
+                  "No email"
+                )}
+              </span>
+
+            </div>
+
+            <small>
+              ${escapeHtml(
+                company.city || ""
+              )}
+
+              ${
+                company.postcode
+                  ? " · " +
+                    escapeHtml(
+                      company.postcode
+                    )
+                  : ""
+              }
+            </small>
 
           </div>
 
-          <small>
-            ${escapeHtml(company.city || "")}
-            ${company.postcode ? " · " + escapeHtml(company.postcode) : ""}
-          </small>
-
-        </div>
-
-      `).join("")}
+        `).join("")
+      }
 
     </div>
 
@@ -1479,7 +1948,7 @@ async function loadAdminCompanies() {
 
 
 /* =========================================================
-   AUTH STATE CHANGES
+   AUTH STATE
 ========================================================= */
 
 supabase.auth.onAuthStateChange(
@@ -1487,11 +1956,13 @@ supabase.auth.onAuthStateChange(
 
     if (session?.user) {
 
-      currentUser = session.user;
+      currentUser =
+        session.user;
 
     } else {
 
-      currentUser = null;
+      currentUser =
+        null;
 
     }
 
@@ -1503,85 +1974,121 @@ supabase.auth.onAuthStateChange(
    PORTAL CONTROLS
 ========================================================= */
 
-$("accountButton").addEventListener(
+$("accountButton")?.addEventListener(
   "click",
   openPortal
 );
 
 
-$("portalClose").addEventListener(
+$("portalClose")?.addEventListener(
   "click",
   closePortal
 );
 
 
-portal.addEventListener("click", event => {
+portal?.addEventListener(
+  "click",
+  event => {
 
-  if (event.target === portal) {
-    closePortal();
-  }
-
-});
-
-
-document.addEventListener("keydown", event => {
-
-  if (event.key === "Escape") {
-
-    closeModal();
-
-    closePortal();
-
-    closeMobileMenu();
+    if (event.target === portal) {
+      closePortal();
+    }
 
   }
+);
 
-});
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Escape") {
+
+      closeModal();
+
+      closePortal();
+
+      closeMobileMenu();
+
+    }
+
+  }
+);
 
 
 /* =========================================================
-   STARTUP
-========================================================= */
-
-/* =========================================================
-   NEW: SCROLL REVEAL
-   (additive only — does not touch any existing logic above)
+   SCROLL REVEAL
 ========================================================= */
 
 (function initScrollReveal() {
 
-  const revealEls = document.querySelectorAll("[data-reveal]");
+  const revealEls =
+    document.querySelectorAll(
+      "[data-reveal]"
+    );
+
 
   if (!revealEls.length) {
     return;
   }
 
-  if (!("IntersectionObserver" in window)) {
-    revealEls.forEach(el => el.classList.add("is-visible"));
+
+  if (
+    !("IntersectionObserver" in window)
+  ) {
+
+    revealEls.forEach(
+      el =>
+        el.classList.add(
+          "is-visible"
+        )
+    );
+
     return;
+
   }
 
-  const io = new IntersectionObserver((entries) => {
 
-    entries.forEach(entry => {
+  const io =
+    new IntersectionObserver(
+      entries => {
 
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        io.unobserve(entry.target);
+        entries.forEach(
+          entry => {
+
+            if (
+              entry.isIntersecting
+            ) {
+
+              entry.target.classList.add(
+                "is-visible"
+              );
+
+              io.unobserve(
+                entry.target
+              );
+
+            }
+
+          }
+        );
+
+      },
+      {
+        threshold: 0.12,
+        rootMargin:
+          "0px 0px -40px 0px"
       }
+    );
 
-    });
 
-  }, {
-    threshold: 0.12,
-    rootMargin: "0px 0px -40px 0px"
-  });
-
-  revealEls.forEach(el => io.observe(el));
+  revealEls.forEach(
+    el => io.observe(el)
+  );
 
 })();
 
 
 console.log(
-  "The Gesture Co. website loaded successfully."
+  "[The Gesture Co.] Website loaded successfully."
 );
