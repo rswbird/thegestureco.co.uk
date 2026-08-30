@@ -1,4 +1,3 @@
-```js
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL =
@@ -15,4 +14,3 @@ export const supabase = createClient(
 console.log(
   "[The Gesture Co.] Supabase client loaded successfully."
 );
-```
