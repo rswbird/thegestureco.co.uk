@@ -65,9 +65,18 @@ function closeModal() {
 }
 
 
+/* Close buttons */
+
 document.querySelectorAll("[data-close-modal]").forEach((button) => {
   button.addEventListener("click", closeModal);
 });
+
+
+const closeModalButton = $("closeModal");
+
+if (closeModalButton) {
+  closeModalButton.addEventListener("click", closeModal);
+}
 
 
 if (modal) {
@@ -80,26 +89,80 @@ if (modal) {
 
 
 /* =========================================================
-   MOBILE NAVIGATION
+   ENQUIRY BUTTONS
 ========================================================= */
 
-const menuToggle = $("menuToggle");
-const mobileNav = $("mobileNav");
-
-if (menuToggle && mobileNav) {
-  menuToggle.addEventListener("click", () => {
-    mobileNav.classList.toggle("show");
-  });
+function openEnquiry() {
+  openModal();
 }
 
 
-document.querySelectorAll("#mobileNav a").forEach((link) => {
-  link.addEventListener("click", () => {
-    if (mobileNav) {
-      mobileNav.classList.remove("show");
-    }
-  });
+[
+  "navEnquire",
+  "heroQuote",
+  "corporateEnquire",
+  "bespokeEnquire",
+  "ctaContact",
+  "personalGift"
+].forEach((id) => {
+
+  const button = $(id);
+
+  if (button) {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      openEnquiry();
+    });
+  }
+
 });
+
+
+/* =========================================================
+   MOBILE NAVIGATION
+========================================================= */
+
+const menuButton = $("menuButton");
+const mobileMenu = $("mobileMenu");
+
+
+if (menuButton && mobileMenu) {
+
+  menuButton.addEventListener("click", () => {
+
+    const isOpen =
+      mobileMenu.classList.toggle("show");
+
+    menuButton.setAttribute(
+      "aria-expanded",
+      isOpen ? "true" : "false"
+    );
+
+  });
+
+}
+
+
+document
+  .querySelectorAll("#mobileMenu a")
+  .forEach((link) => {
+
+    link.addEventListener("click", () => {
+
+      if (mobileMenu) {
+        mobileMenu.classList.remove("show");
+      }
+
+      if (menuButton) {
+        menuButton.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+      }
+
+    });
+
+  });
 
 
 /* =========================================================
@@ -107,12 +170,16 @@ document.querySelectorAll("#mobileNav a").forEach((link) => {
 ========================================================= */
 
 function openPortal() {
+
   if (!portal) {
-    console.error("[Portal] #portal element not found.");
+    console.error(
+      "[Portal] #portal was not found."
+    );
     return;
   }
 
   portal.classList.add("show");
+
   document.body.style.overflow = "hidden";
 
   checkCurrentUser();
@@ -120,60 +187,64 @@ function openPortal() {
 
 
 function closePortal() {
+
   if (!portal) return;
 
   portal.classList.remove("show");
+
   document.body.style.overflow = "";
+
 }
 
 
-/*
-   IMPORTANT:
-   Use delegated click handling so MY ACCOUNT works whether
-   the HTML uses a button, anchor, ID, or data attribute.
-*/
+/* MY ACCOUNT */
 
-document.addEventListener("click", (event) => {
-  const element = event.target.closest("a, button");
+const accountButton = $("accountButton");
 
-  if (!element) return;
+if (accountButton) {
 
-  const text = element.textContent
-    .trim()
-    .replace(/\s+/g, " ")
-    .toUpperCase();
+  accountButton.addEventListener(
+    "click",
+    (event) => {
 
-  const isPortalButton =
-    element.matches(
-      "[data-open-portal], #portalButton, #accountButton, #myAccount, #myAccountButton"
-    );
+      event.preventDefault();
 
-  const isMyAccountText =
-    text === "MY ACCOUNT" ||
-    text.includes("MY ACCOUNT");
+      openPortal();
 
-  if (isPortalButton || isMyAccountText) {
-    event.preventDefault();
-    event.stopPropagation();
+    }
+  );
 
-    openPortal();
-  }
-});
+}
 
 
-const portalCloseButton = $("portalClose");
+/* Close portal */
+
+const portalCloseButton =
+  $("portalClose");
 
 if (portalCloseButton) {
-  portalCloseButton.addEventListener("click", closePortal);
+
+  portalCloseButton.addEventListener(
+    "click",
+    closePortal
+  );
+
 }
 
 
 if (portal) {
-  portal.addEventListener("click", (event) => {
-    if (event.target === portal) {
-      closePortal();
+
+  portal.addEventListener(
+    "click",
+    (event) => {
+
+      if (event.target === portal) {
+        closePortal();
+      }
+
     }
-  });
+  );
+
 }
 
 
@@ -182,15 +253,22 @@ if (portal) {
 ========================================================= */
 
 function showPanel(id) {
-  document.querySelectorAll(".portal-panel").forEach((panel) => {
-    panel.classList.remove("active");
-  });
+
+  document
+    .querySelectorAll(".portal-panel")
+    .forEach((panel) => {
+
+      panel.classList.remove("active");
+
+    });
+
 
   const panel = $(id);
 
   if (panel) {
     panel.classList.add("active");
   }
+
 }
 
 
@@ -199,57 +277,113 @@ function showPanel(id) {
 ========================================================= */
 
 function setAuthMode(mode) {
+
   authMode = mode;
 
-  const loginButton = $("loginTab");
-  const signupButton = $("signupTab");
 
-  if (loginButton) {
-    loginButton.classList.toggle("active", mode === "login");
+  const authNameField =
+    $("signupNameField");
+
+  const authSubmit =
+    $("authSubmit");
+
+  const authTitle =
+    $("authTitle");
+
+  const authSubtitle =
+    $("authSubtitle");
+
+  const toggleAuth =
+    $("toggleAuth");
+
+
+  if (authNameField) {
+
+    authNameField.classList.toggle(
+      "hidden",
+      mode !== "signup"
+    );
+
   }
 
-  if (signupButton) {
-    signupButton.classList.toggle("active", mode === "signup");
-  }
 
-  const submitButton = $("authSubmit");
+  if (authSubmit) {
 
-  if (submitButton) {
-    submitButton.textContent =
+    authSubmit.textContent =
       mode === "login"
-        ? "LOGIN"
+        ? "SIGN IN"
         : "CREATE ACCOUNT";
+
   }
 
-  const authTitle = $("authTitle");
 
   if (authTitle) {
+
     authTitle.textContent =
       mode === "login"
         ? "Welcome back."
         : "Create your account.";
+
   }
 
-  const authMessage = $("authMessage");
 
-  if (authMessage) {
-    authMessage.textContent = "";
-    authMessage.className = "auth-message";
+  if (authSubtitle) {
+
+    authSubtitle.textContent =
+      mode === "login"
+        ? "Sign in to manage your company, orders and documents."
+        : "Create your account to access the customer portal.";
+
   }
+
+
+  if (toggleAuth) {
+
+    toggleAuth.textContent =
+      mode === "login"
+        ? "Need an account? Create one"
+        : "Already have an account? Sign in";
+
+  }
+
+
+  const message =
+    $("authMessage");
+
+  if (message) {
+
+    message.textContent = "";
+
+    message.className =
+      "auth-message";
+
+  }
+
 }
 
 
-if ($("loginTab")) {
-  $("loginTab").addEventListener("click", () => {
-    setAuthMode("login");
-  });
-}
+/* =========================================================
+   AUTH TOGGLE
+========================================================= */
 
+const toggleAuth =
+  $("toggleAuth");
 
-if ($("signupTab")) {
-  $("signupTab").addEventListener("click", () => {
-    setAuthMode("signup");
-  });
+if (toggleAuth) {
+
+  toggleAuth.addEventListener(
+    "click",
+    () => {
+
+      setAuthMode(
+        authMode === "login"
+          ? "signup"
+          : "login"
+      );
+
+    }
+  );
+
 }
 
 
@@ -257,117 +391,204 @@ if ($("signupTab")) {
    AUTH FORM
 ========================================================= */
 
-const authForm = $("authForm");
+const authForm =
+  $("authForm");
+
 
 if (authForm) {
-  authForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
 
-    const email = $("authEmail")?.value.trim();
-    const password = $("authPassword")?.value;
-    const fullName = $("authName")?.value.trim();
+  authForm.addEventListener(
+    "submit",
+    async (event) => {
 
-    const message = $("authMessage");
-    const submitButton = $("authSubmit");
+      event.preventDefault();
 
-    if (!email || !password) {
-      showMessage(
-        message,
-        "Please enter your email address and password.",
-        "error"
-      );
-      return;
-    }
 
-    if (authMode === "signup" && !fullName) {
-      showMessage(
-        message,
-        "Please enter your full name.",
-        "error"
-      );
-      return;
-    }
+      const email =
+        $("authEmail")?.value
+          .trim()
+          .toLowerCase();
 
-    if (submitButton) {
-      submitButton.disabled = true;
-      submitButton.textContent =
-        authMode === "login"
-          ? "LOGGING IN..."
-          : "CREATING ACCOUNT...";
-    }
 
-    try {
-      if (authMode === "login") {
-        const { data, error } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
+      const password =
+        $("authPassword")?.value;
 
-        if (error) throw error;
 
-        currentUser = data.user;
+      const fullName =
+        $("signupName")?.value.trim();
+
+
+      const message =
+        $("authMessage");
+
+
+      const submitButton =
+        $("authSubmit");
+
+
+      if (!email || !password) {
 
         showMessage(
           message,
-          "Login successful.",
-          "success"
+          "Please enter your email address and password.",
+          "error"
         );
 
-        await loadUser();
-
-      } else {
-        const { data, error } =
-          await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                full_name: fullName
-              }
-            }
-          });
-
-        if (error) throw error;
-
-        if (data.user) {
-          currentUser = data.user;
-        }
-
-        showMessage(
-          message,
-          "Account created. Please check your email if confirmation is required.",
-          "success"
-        );
-
-        if (data.session) {
-          await loadUser();
-        }
+        return;
       }
 
-    } catch (error) {
-      console.error(
-        "Authentication error:",
-        error
-      );
 
-      showMessage(
-        message,
-        error.message ||
-          "Something went wrong. Please try again.",
-        "error"
-      );
+      if (
+        authMode === "signup" &&
+        !fullName
+      ) {
 
-    } finally {
+        showMessage(
+          message,
+          "Please enter your full name.",
+          "error"
+        );
+
+        return;
+      }
+
+
       if (submitButton) {
-        submitButton.disabled = false;
+
+        submitButton.disabled = true;
+
         submitButton.textContent =
           authMode === "login"
-            ? "LOGIN"
-            : "CREATE ACCOUNT";
+            ? "SIGNING IN..."
+            : "CREATING ACCOUNT...";
+
       }
+
+
+      try {
+
+        if (authMode === "login") {
+
+          const {
+            data,
+            error
+          } =
+            await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+
+          if (error) {
+            throw error;
+          }
+
+
+          currentUser =
+            data.user;
+
+
+          showMessage(
+            message,
+            "Login successful.",
+            "success"
+          );
+
+
+          await loadUser();
+
+
+        } else {
+
+          const {
+            data,
+            error
+          } =
+            await supabase.auth.signUp({
+
+              email,
+
+              password,
+
+              options: {
+
+                data: {
+                  full_name: fullName
+                }
+
+              }
+
+            });
+
+
+          if (error) {
+            throw error;
+          }
+
+
+          if (data.user) {
+            currentUser = data.user;
+          }
+
+
+          if (data.session) {
+
+            showMessage(
+              message,
+              "Account created successfully.",
+              "success"
+            );
+
+
+            await loadUser();
+
+          } else {
+
+            showMessage(
+              message,
+              "Account created. Please check your email if confirmation is required.",
+              "success"
+            );
+
+          }
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "Authentication error:",
+          error
+        );
+
+
+        showMessage(
+          message,
+          error.message ||
+            "Something went wrong. Please try again.",
+          "error"
+        );
+
+
+      } finally {
+
+        if (submitButton) {
+
+          submitButton.disabled = false;
+
+          submitButton.textContent =
+            authMode === "login"
+              ? "SIGN IN"
+              : "CREATE ACCOUNT";
+
+        }
+
+      }
+
     }
-  });
+  );
+
 }
 
 
@@ -376,18 +597,24 @@ if (authForm) {
 ========================================================= */
 
 function isInvitationLink() {
-  const searchParams = new URLSearchParams(
-    window.location.search
-  );
 
-  const hashParams = new URLSearchParams(
-    window.location.hash.replace(/^#/, "")
-  );
+  const searchParams =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const hashParams =
+    new URLSearchParams(
+      window.location.hash.replace(/^#/, "")
+    );
+
 
   return (
     searchParams.get("type") === "invite" ||
     hashParams.get("type") === "invite"
   );
+
 }
 
 
@@ -396,107 +623,150 @@ function isInvitationLink() {
 ========================================================= */
 
 async function handleInvitationFlow() {
+
   try {
-    const searchParams = new URLSearchParams(
-      window.location.search
-    );
+
+    const searchParams =
+      new URLSearchParams(
+        window.location.search
+      );
+
 
     const tokenHash =
       searchParams.get("token_hash");
 
+
     if (tokenHash) {
-      const { data, error } =
+
+      const {
+        data,
+        error
+      } =
         await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: "invite"
+
+          token_hash:
+            tokenHash,
+
+          type:
+            "invite"
+
         });
 
+
       if (error) {
+
         console.error(
           "Invitation verification error:",
           error
         );
 
+
         showPanel("authPanel");
 
-        const authMessage =
-          $("authMessage");
 
         showMessage(
-          authMessage,
+          $("authMessage"),
           "This invitation link is invalid or has expired. Please ask your company administrator to send a new invitation.",
           "error"
         );
 
+
         return true;
+
       }
+
 
       if (data?.user) {
         currentUser = data.user;
       }
+
     }
+
 
     const {
       data: sessionData
-    } = await supabase.auth.getSession();
+    } =
+      await supabase.auth.getSession();
+
 
     const invitedUser =
       sessionData?.session?.user ||
       currentUser;
 
+
     if (!invitedUser) {
+
       showPanel("authPanel");
 
-      const authMessage =
-        $("authMessage");
 
       showMessage(
-        authMessage,
+        $("authMessage"),
         "Please use the invitation link from your email again.",
         "error"
       );
 
+
       return true;
+
     }
 
-    currentUser = invitedUser;
+
+    currentUser =
+      invitedUser;
+
 
     if (portal) {
+
       portal.classList.add("show");
-      document.body.style.overflow = "hidden";
+
+      document.body.style.overflow =
+        "hidden";
+
     }
 
-    showPanel("invitePasswordPanel");
+
+    showPanel(
+      "invitePasswordPanel"
+    );
+
 
     const emailField =
       $("invitePasswordEmail");
 
+
     if (emailField) {
+
       emailField.value =
         invitedUser.email || "";
+
     }
+
 
     return true;
 
+
   } catch (error) {
+
     console.error(
       "Invitation flow error:",
       error
     );
 
+
     showPanel("authPanel");
 
-    const authMessage =
-      $("authMessage");
 
     showMessage(
-      authMessage,
+      $("authMessage"),
       "We could not process your invitation. Please try the invitation link again.",
       "error"
     );
 
+
     return true;
+
   }
+
 }
 
 
@@ -507,88 +777,130 @@ async function handleInvitationFlow() {
 const invitePasswordForm =
   $("invitePasswordForm");
 
+
 if (invitePasswordForm) {
+
   invitePasswordForm.addEventListener(
     "submit",
     async (event) => {
 
       event.preventDefault();
 
+
       const password =
         $("inviteNewPassword")?.value;
+
 
       const confirmPassword =
         $("inviteConfirmPassword")?.value;
 
+
       const message =
         $("invitePasswordMessage");
+
 
       const submitButton =
         $("invitePasswordSubmit");
 
-      if (!password || !confirmPassword) {
+
+      if (
+        !password ||
+        !confirmPassword
+      ) {
+
         showMessage(
           message,
           "Please enter and confirm your password.",
           "error"
         );
+
         return;
       }
 
+
       if (password.length < 6) {
+
         showMessage(
           message,
           "Your password must be at least 6 characters.",
           "error"
         );
+
         return;
       }
 
-      if (password !== confirmPassword) {
+
+      if (
+        password !== confirmPassword
+      ) {
+
         showMessage(
           message,
           "The passwords do not match.",
           "error"
         );
+
         return;
       }
 
+
       if (!currentUser) {
+
         const {
           data: sessionData
-        } = await supabase.auth.getSession();
+        } =
+          await supabase.auth.getSession();
+
 
         currentUser =
-          sessionData?.session?.user || null;
+          sessionData?.session?.user ||
+          null;
+
       }
 
+
       if (!currentUser) {
+
         showMessage(
           message,
           "Your invitation session could not be found. Please open the invitation email again.",
           "error"
         );
+
         return;
       }
 
+
       if (submitButton) {
+
         submitButton.disabled = true;
+
         submitButton.textContent =
           "CREATING ACCOUNT...";
+
       }
 
+
       try {
+
         const {
           data,
           error
-        } = await supabase.auth.updateUser({
-          password
-        });
+        } =
+          await supabase.auth.updateUser({
+            password
+          });
 
-        if (error) throw error;
+
+        if (error) {
+          throw error;
+        }
+
 
         currentUser =
-          data?.user || currentUser;
+          data?.user ||
+          currentUser;
+
 
         showMessage(
           message,
@@ -596,17 +908,23 @@ if (invitePasswordForm) {
           "success"
         );
 
-        await new Promise((resolve) =>
-          setTimeout(resolve, 700)
+
+        await new Promise(
+          (resolve) =>
+            setTimeout(resolve, 700)
         );
+
 
         await loadUser();
 
+
       } catch (error) {
+
         console.error(
           "Password creation error:",
           error
         );
+
 
         showMessage(
           message,
@@ -615,15 +933,23 @@ if (invitePasswordForm) {
           "error"
         );
 
+
       } finally {
+
         if (submitButton) {
+
           submitButton.disabled = false;
+
           submitButton.textContent =
             "CREATE MY ACCOUNT";
+
         }
+
       }
+
     }
   );
+
 }
 
 
@@ -632,36 +958,50 @@ if (invitePasswordForm) {
 ========================================================= */
 
 async function checkCurrentUser() {
+
   try {
 
     if (isInvitationLink()) {
+
       const handled =
         await handleInvitationFlow();
+
 
       if (handled) {
         return;
       }
+
     }
+
 
     const {
       data,
       error
-    } = await supabase.auth.getSession();
+    } =
+      await supabase.auth.getSession();
 
-    if (error) throw error;
+
+    if (error) {
+      throw error;
+    }
+
 
     if (data.session?.user) {
 
       currentUser =
         data.session.user;
 
+
       await loadUser();
 
     } else {
 
+      setAuthMode("login");
+
       showPanel("authPanel");
 
     }
+
 
   } catch (error) {
 
@@ -670,8 +1010,13 @@ async function checkCurrentUser() {
       error
     );
 
+
+    setAuthMode("login");
+
     showPanel("authPanel");
+
   }
+
 }
 
 
@@ -682,30 +1027,43 @@ async function checkCurrentUser() {
 async function loadUser() {
 
   if (!currentUser) {
+
     showPanel("authPanel");
+
     return;
+
   }
+
 
   try {
 
     const {
       data: profile,
       error: profileError
-    } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .maybeSingle();
+    } =
+      await supabase
+        .from("profiles")
+        .select("*")
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .maybeSingle();
+
 
     if (profileError) {
+
       console.error(
         "Profile loading error:",
         profileError
       );
+
     }
+
 
     currentProfile =
       profile || null;
+
 
     if (
       currentProfile?.is_admin === true
@@ -716,11 +1074,14 @@ async function loadUser() {
       showPanel("adminPanel");
 
       return;
+
     }
+
 
     await loadCustomerPortal();
 
     showPanel("customerPanel");
+
 
   } catch (error) {
 
@@ -729,17 +1090,18 @@ async function loadUser() {
       error
     );
 
+
     showPanel("authPanel");
 
-    const authMessage =
-      $("authMessage");
 
     showMessage(
-      authMessage,
+      $("authMessage"),
       "We could not load your account. Please try again.",
       "error"
     );
+
   }
+
 }
 
 
@@ -751,19 +1113,22 @@ async function loadCustomerPortal() {
 
   if (!currentUser) return;
 
+
   try {
 
     const {
       data: membership,
       error: membershipError
-    } = await supabase
-      .from("company_members")
-      .select("*")
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .maybeSingle();
+    } =
+      await supabase
+        .from("company_members")
+        .select("*")
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .maybeSingle();
+
 
     if (membershipError) {
 
@@ -774,22 +1139,26 @@ async function loadCustomerPortal() {
 
     }
 
+
     currentMembership =
       membership || null;
+
 
     if (currentMembership?.company_id) {
 
       const {
         data: company,
         error: companyError
-      } = await supabase
-        .from("companies")
-        .select("*")
-        .eq(
-          "id",
-          currentMembership.company_id
-        )
-        .maybeSingle();
+      } =
+        await supabase
+          .from("companies")
+          .select("*")
+          .eq(
+            "id",
+            currentMembership.company_id
+          )
+          .maybeSingle();
+
 
       if (companyError) {
 
@@ -800,14 +1169,17 @@ async function loadCustomerPortal() {
 
       }
 
+
       currentCompany =
         company || null;
 
     } else {
 
-      currentCompany = null;
+      currentCompany =
+        null;
 
     }
+
 
     populateCustomerDetails();
 
@@ -823,11 +1195,12 @@ async function loadCustomerPortal() {
     );
 
   }
+
 }
 
 
 /* =========================================================
-   POPULATE CUSTOMER DETAILS
+   CUSTOMER DETAILS
 ========================================================= */
 
 function populateCustomerDetails() {
@@ -838,83 +1211,50 @@ function populateCustomerDetails() {
     currentUser?.email ||
     "Customer";
 
+
   const userEmail =
     currentUser?.email || "";
+
 
   const companyName =
     currentCompany?.name ||
     "No company linked";
 
 
-  const nameElements = [
-    $("customerName"),
-    $("dashboardName"),
-    $("profileName")
-  ];
-
-  nameElements.forEach((element) => {
-
-    if (element) {
-      element.textContent = userName;
-    }
-
-  });
+  const welcome =
+    $("customerWelcome");
 
 
-  const emailElements = [
-    $("customerEmail"),
-    $("profileEmail")
-  ];
+  if (welcome) {
 
-  emailElements.forEach((element) => {
-
-    if (element) {
-      element.textContent = userEmail;
-    }
-
-  });
-
-
-  const companyElements = [
-    $("customerCompany"),
-    $("dashboardCompany"),
-    $("profileCompany")
-  ];
-
-  companyElements.forEach((element) => {
-
-    if (element) {
-      element.textContent = companyName;
-    }
-
-  });
-
-
-  const nameInput =
-    $("profileNameInput");
-
-  if (nameInput) {
-    nameInput.value = userName;
-  }
-
-
-  const emailInput =
-    $("profileEmailInput");
-
-  if (emailInput) {
-    emailInput.value = userEmail;
-  }
-
-
-  const companyInput =
-    $("companyNameInput");
-
-  if (companyInput) {
-
-    companyInput.value =
-      currentCompany?.name || "";
+    welcome.textContent =
+      `Welcome, ${userName}`;
 
   }
+
+
+  const companyDetails =
+    $("companyDetails");
+
+
+  if (companyDetails) {
+
+    companyDetails.innerHTML = `
+
+      <div>
+        <strong>
+          ${escapeHtml(companyName)}
+        </strong>
+      </div>
+
+      <div>
+        ${escapeHtml(userEmail)}
+      </div>
+
+    `;
+
+  }
+
 }
 
 
@@ -924,23 +1264,31 @@ function populateCustomerDetails() {
 
 async function loadCustomerOrders() {
 
-  if (!currentUser) return;
+  const ordersBody =
+    $("ordersBody");
 
-  const ordersContainer =
-    $("customerOrders");
 
-  if (!ordersContainer) return;
+  if (!ordersBody) return;
 
 
   if (!currentCompany?.id) {
 
-    ordersContainer.innerHTML = `
-      <div class="empty-state">
-        <p>No company account is linked to your account yet.</p>
-      </div>
+    ordersBody.innerHTML = `
+
+      <tr>
+
+        <td colspan="5">
+          No company account is linked to your account yet.
+        </td>
+
+      </tr>
+
     `;
 
+    updateCustomerStats([]);
+
     return;
+
   }
 
 
@@ -949,21 +1297,30 @@ async function loadCustomerOrders() {
     const {
       data: orders,
       error
-    } = await supabase
-      .from("orders")
-      .select("*")
-      .eq(
-        "company_id",
-        currentCompany.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    } =
+      await supabase
+        .from("orders")
+        .select("*")
+        .eq(
+          "company_id",
+          currentCompany.id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
-    if (error) throw error;
+
+    if (error) {
+      throw error;
+    }
+
+
+    updateCustomerStats(
+      orders || []
+    );
 
 
     if (
@@ -971,96 +1328,105 @@ async function loadCustomerOrders() {
       orders.length === 0
     ) {
 
-      ordersContainer.innerHTML = `
-        <div class="empty-state">
-          <p>You don't have any orders yet.</p>
-        </div>
+      ordersBody.innerHTML = `
+
+        <tr>
+
+          <td colspan="5">
+            You don't have any orders yet.
+          </td>
+
+        </tr>
+
       `;
 
       return;
+
     }
 
 
-    ordersContainer.innerHTML =
-      orders.map((order) => `
+    ordersBody.innerHTML =
+      orders.map((order) => {
 
-        <div class="order-card">
+        const orderNumber =
+          order.order_number ||
+          order.id?.slice(0, 8) ||
+          "";
 
-          <div class="order-card-top">
 
-            <div>
+        const status =
+          order.status ||
+          "Processing";
 
+
+        const total =
+          Number(
+            order.total || 0
+          ).toFixed(2);
+
+
+        const date =
+          order.created_at
+            ? new Date(
+                order.created_at
+              ).toLocaleDateString(
+                "en-GB"
+              )
+            : "";
+
+
+        const delivery =
+          order.tracking_status ||
+          status;
+
+
+        return `
+
+          <tr>
+
+            <td>
               <strong>
-                Order #${escapeHtml(
-                  order.order_number ||
-                  order.id?.slice(0, 8) ||
-                  ""
+                #${escapeHtml(
+                  orderNumber
                 )}
               </strong>
+            </td>
 
-              <span>
-                ${
-                  order.created_at
-                    ? new Date(
-                        order.created_at
-                      ).toLocaleDateString(
-                        "en-GB"
-                      )
-                    : ""
-                }
-              </span>
+            <td>
+              ${escapeHtml(status)}
+            </td>
 
-            </div>
+            <td>
+              £${total}
+            </td>
 
+            <td>
+              ${escapeHtml(delivery)}
+            </td>
 
-            <div>
+            <td>
+              ${
+                order.invoice_url
+                  ? `
+                    <a
+                      href="${escapeHtml(
+                        order.invoice_url
+                      )}"
+                      target="_blank"
+                      rel="noopener">
+                      DOWNLOAD
+                    </a>
+                  `
+                  : "—"
+              }
+            </td>
 
-              <span class="status">
-                ${escapeHtml(
-                  order.status ||
-                  "Processing"
-                )}
-              </span>
+          </tr>
 
-            </div>
+        `;
 
-          </div>
+      }).join("");
 
-
-          <div class="order-card-bottom">
-
-            <div>
-
-              <small>Total</small>
-
-              <strong>
-                £${Number(
-                  order.total || 0
-                ).toFixed(2)}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <small>Delivery</small>
-
-              <strong>
-                ${escapeHtml(
-                  order.tracking_status ||
-                  order.status ||
-                  "Processing"
-                )}
-              </strong>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      `).join("");
 
   } catch (error) {
 
@@ -1069,12 +1435,71 @@ async function loadCustomerOrders() {
       error
     );
 
-    ordersContainer.innerHTML = `
-      <div class="empty-state">
-        <p>Unable to load your orders right now.</p>
-      </div>
+
+    ordersBody.innerHTML = `
+
+      <tr>
+
+        <td colspan="5">
+          Unable to load your orders right now.
+        </td>
+
+      </tr>
+
     `;
+
   }
+
+}
+
+
+/* =========================================================
+   CUSTOMER DASHBOARD STATS
+========================================================= */
+
+function updateCustomerStats(orders) {
+
+  const totalOrders =
+    $("totalOrders");
+
+
+  const activeOrders =
+    $("activeOrders");
+
+
+  if (totalOrders) {
+
+    totalOrders.textContent =
+      orders.length;
+
+  }
+
+
+  if (activeOrders) {
+
+    const active =
+      orders.filter((order) => {
+
+        const status =
+          String(
+            order.status || ""
+          ).toLowerCase();
+
+
+        return ![
+          "completed",
+          "delivered",
+          "cancelled"
+        ].includes(status);
+
+      }).length;
+
+
+    activeOrders.textContent =
+      active;
+
+  }
+
 }
 
 
@@ -1084,11 +1509,27 @@ async function loadCustomerOrders() {
 
 async function loadCompanyTeam() {
 
+  const teamList =
+    $("teamList");
+
+
+  if (!teamList) return;
+
+
   if (!currentCompany?.id) {
 
-    renderCompanyTeam([]);
+    teamList.innerHTML = `
+
+      <div class="empty-state">
+        No employees have been added yet.
+      </div>
+
+    `;
+
+    updateTeamCount(0);
 
     return;
+
   }
 
 
@@ -1097,35 +1538,108 @@ async function loadCompanyTeam() {
     const {
       data: members,
       error
-    } = await supabase
-      .from("company_members")
-      .select(`
-        id,
-        user_id,
-        role,
-        created_at,
-        profiles (
-          full_name,
-          email
+    } =
+      await supabase
+        .from("company_members")
+        .select(`
+          id,
+          user_id,
+          role,
+          created_at,
+          profiles (
+            full_name,
+            email
+          )
+        `)
+        .eq(
+          "company_id",
+          currentCompany.id
         )
-      `)
-      .eq(
-        "company_id",
-        currentCompany.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending: true
-        }
-      );
-
-    if (error) throw error;
+        .order(
+          "created_at",
+          {
+            ascending: true
+          }
+        );
 
 
-    renderCompanyTeam(
-      members || []
+    if (error) {
+      throw error;
+    }
+
+
+    updateTeamCount(
+      members?.length || 0
     );
+
+
+    if (
+      !members ||
+      members.length === 0
+    ) {
+
+      teamList.innerHTML = `
+
+        <div class="empty-state">
+          No employees have been added yet.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    teamList.innerHTML =
+      members.map((member) => {
+
+        const profile =
+          member.profiles || {};
+
+
+        const name =
+          profile.full_name ||
+          profile.email ||
+          "Team member";
+
+
+        const email =
+          profile.email ||
+          "";
+
+
+        return `
+
+          <div class="team-member">
+
+            <div class="team-member-info">
+
+              <strong>
+                ${escapeHtml(name)}
+              </strong>
+
+              <span>
+                ${escapeHtml(email)}
+              </span>
+
+            </div>
+
+
+            <div class="team-member-role">
+
+              ${escapeHtml(
+                member.role || "buyer"
+              )}
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join("");
+
 
   } catch (error) {
 
@@ -1134,81 +1648,37 @@ async function loadCompanyTeam() {
       error
     );
 
-    renderCompanyTeam([]);
+
+    teamList.innerHTML = `
+
+      <div class="empty-state">
+        Unable to load company team.
+      </div>
+
+    `;
+
   }
+
 }
 
 
 /* =========================================================
-   RENDER COMPANY TEAM
+   TEAM COUNT
 ========================================================= */
 
-function renderCompanyTeam(members) {
+function updateTeamCount(count) {
 
-  const teamContainer =
-    $("companyTeam");
-
-  if (!teamContainer) return;
+  const teamUsers =
+    $("teamUsers");
 
 
-  if (!members.length) {
+  if (teamUsers) {
 
-    teamContainer.innerHTML = `
-      <div class="empty-state">
-        <p>No employees have been added yet.</p>
-      </div>
-    `;
+    teamUsers.textContent =
+      count;
 
-    return;
   }
 
-
-  teamContainer.innerHTML =
-    members.map((member) => {
-
-      const profile =
-        member.profiles || {};
-
-      const name =
-        profile.full_name ||
-        profile.email ||
-        "Team member";
-
-      const email =
-        profile.email ||
-        "";
-
-
-      return `
-
-        <div class="team-member">
-
-          <div class="team-member-info">
-
-            <strong>
-              ${escapeHtml(name)}
-            </strong>
-
-            <span>
-              ${escapeHtml(email)}
-            </span>
-
-          </div>
-
-
-          <div class="team-member-role">
-
-            ${escapeHtml(
-              member.role || "buyer"
-            )}
-
-          </div>
-
-        </div>
-
-      `;
-
-    }).join("");
 }
 
 
@@ -1216,68 +1686,78 @@ function renderCompanyTeam(members) {
    INVITE EMPLOYEE
 ========================================================= */
 
-const inviteEmployeeForm =
-  $("inviteEmployeeForm");
+const inviteButton =
+  $("inviteButton");
 
-if (inviteEmployeeForm) {
 
-  inviteEmployeeForm.addEventListener(
-    "submit",
+if (inviteButton) {
+
+  inviteButton.addEventListener(
+    "click",
     async (event) => {
 
       event.preventDefault();
 
+
       const email =
-        $("employeeEmail")?.value
+        $("inviteEmail")?.value
           .trim()
           .toLowerCase();
 
-      const message =
-        $("inviteEmployeeMessage");
 
-      const submitButton =
-        $("inviteEmployeeSubmit");
+      const message =
+        $("inviteMessage");
 
 
       if (!email) {
 
-        showMessage(
-          message,
-          "Please enter an employee email address.",
-          "error"
-        );
+        if (message) {
+
+          message.textContent =
+            "Please enter an employee email address.";
+
+          message.className =
+            "auth-message error";
+
+        }
 
         return;
+
       }
 
 
       if (!currentCompany?.id) {
 
-        showMessage(
-          message,
-          "Your account is not linked to a company.",
-          "error"
-        );
+        if (message) {
+
+          message.textContent =
+            "Your account is not linked to a company.";
+
+          message.className =
+            "auth-message error";
+
+        }
 
         return;
+
       }
 
 
       try {
 
-        if (submitButton) {
+        inviteButton.disabled =
+          true;
 
-          submitButton.disabled = true;
 
-          submitButton.textContent =
-            "SENDING...";
-
-        }
+        inviteButton.textContent =
+          "SENDING...";
 
 
         const {
           data: sessionData
-        } = await supabase.auth.getSession();
+        } =
+          await supabase.auth.getSession();
+
 
         const accessToken =
           sessionData?.session?.access_token;
@@ -1295,7 +1775,8 @@ if (inviteEmployeeForm) {
         const {
           data: userData,
           error: userError
-        } = await supabase.auth.getUser();
+        } =
+          await supabase.auth.getUser();
 
 
         if (userError) {
@@ -1315,21 +1796,29 @@ if (inviteEmployeeForm) {
         const {
           data,
           error
-        } = await supabase.functions.invoke(
-          "invite-company-member",
-          {
-            body: {
-              email,
-              company_id:
-                currentCompany.id
-            },
+        } =
+          await supabase.functions.invoke(
+            "invite-company-member",
+            {
 
-            headers: {
-              Authorization:
-                `Bearer ${accessToken}`
+              body: {
+
+                email,
+
+                company_id:
+                  currentCompany.id
+
+              },
+
+              headers: {
+
+                Authorization:
+                  `Bearer ${accessToken}`
+
+              }
+
             }
-          }
-        );
+          );
 
 
         if (error) {
@@ -1349,19 +1838,28 @@ if (inviteEmployeeForm) {
         }
 
 
-        showMessage(
-          message,
-          "Invitation sent successfully. The employee will receive an email with a link to create their password.",
-          "success"
-        );
+        if (message) {
+
+          message.textContent =
+            "Invitation sent successfully. The employee will receive an email with a link to create their password.";
+
+          message.className =
+            "auth-message success";
+
+        }
 
 
-        if ($("employeeEmail")) {
-          $("employeeEmail").value = "";
+        const emailInput =
+          $("inviteEmail");
+
+
+        if (emailInput) {
+          emailInput.value = "";
         }
 
 
         await loadCompanyTeam();
+
 
       } catch (error) {
 
@@ -1371,28 +1869,50 @@ if (inviteEmployeeForm) {
         );
 
 
-        showMessage(
-          message,
-          error.message ||
-            "Unable to send the invitation.",
-          "error"
-        );
+        if (message) {
+
+          message.textContent =
+            error.message ||
+            "Unable to send the invitation.";
+
+          message.className =
+            "auth-message error";
+
+        }
+
 
       } finally {
 
-        if (submitButton) {
+        inviteButton.disabled =
+          false;
 
-          submitButton.disabled = false;
 
-          submitButton.textContent =
-            "INVITE EMPLOYEE";
-
-        }
+        inviteButton.textContent =
+          "INVITE EMPLOYEE";
 
       }
 
     }
   );
+
+}
+
+
+/* =========================================================
+   CUSTOMER LOGOUT
+========================================================= */
+
+const customerLogout =
+  $("customerLogout");
+
+
+if (customerLogout) {
+
+  customerLogout.addEventListener(
+    "click",
+    logout
+  );
+
 }
 
 
@@ -1409,6 +1929,7 @@ async function loadAdminPortal() {
   await loadAdminOrders();
 
   await loadAdminCompanies();
+
 }
 
 
@@ -1418,41 +1939,46 @@ async function loadAdminPortal() {
 
 function populateAdminDetails() {
 
+  const adminName =
+    $("adminName");
+
+
+  const adminDashboardName =
+    $("adminDashboardName");
+
+
+  const adminEmail =
+    $("adminEmail");
+
+
   const name =
     currentProfile?.full_name ||
     currentUser?.email ||
     "Admin";
+
 
   const email =
     currentUser?.email ||
     "";
 
 
-  const nameElements = [
-    $("adminName"),
-    $("adminDashboardName")
-  ];
-
-  nameElements.forEach((element) => {
-
-    if (element) {
-      element.textContent = name;
-    }
-
-  });
+  if (adminName) {
+    adminName.textContent =
+      name;
+  }
 
 
-  const emailElements = [
-    $("adminEmail")
-  ];
+  if (adminDashboardName) {
+    adminDashboardName.textContent =
+      name;
+  }
 
-  emailElements.forEach((element) => {
 
-    if (element) {
-      element.textContent = email;
-    }
+  if (adminEmail) {
+    adminEmail.textContent =
+      email;
+  }
 
-  });
 }
 
 
@@ -1465,6 +1991,7 @@ async function loadAdminProducts() {
   const container =
     $("adminProducts");
 
+
   if (!container) return;
 
 
@@ -1473,29 +2000,38 @@ async function loadAdminProducts() {
     const {
       data: products,
       error
-    } = await supabase
-      .from("products")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    } =
+      await supabase
+        .from("products")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
 
-    if (!products?.length) {
+    if (
+      !products ||
+      products.length === 0
+    ) {
 
       container.innerHTML = `
+
         <div class="empty-state">
-          <p>No products have been added yet.</p>
+          No products have been added yet.
         </div>
+
       `;
 
       return;
+
     }
 
 
@@ -1535,6 +2071,7 @@ async function loadAdminProducts() {
 
       `).join("");
 
+
   } catch (error) {
 
     console.error(
@@ -1544,11 +2081,15 @@ async function loadAdminProducts() {
 
 
     container.innerHTML = `
+
       <div class="empty-state">
-        <p>Unable to load products.</p>
+        Unable to load products.
       </div>
+
     `;
+
   }
+
 }
 
 
@@ -1558,10 +2099,11 @@ async function loadAdminProducts() {
 
 async function loadAdminOrders() {
 
-  const container =
-    $("adminOrders");
+  const ordersBody =
+    $("adminOrdersBody");
 
-  if (!container) return;
+
+  if (!ordersBody) return;
 
 
   try {
@@ -1569,83 +2111,111 @@ async function loadAdminOrders() {
     const {
       data: orders,
       error
-    } = await supabase
-      .from("orders")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    } =
+      await supabase
+        .from("orders")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
-    if (error) throw error;
-
-
-    if (!orders?.length) {
-
-      container.innerHTML = `
-        <div class="empty-state">
-          <p>No orders have been placed yet.</p>
-        </div>
-      `;
-
-      return;
+    if (error) {
+      throw error;
     }
 
 
-    container.innerHTML =
-      orders.map((order) => `
+    if (
+      !orders ||
+      orders.length === 0
+    ) {
 
-        <div class="admin-order">
+      ordersBody.innerHTML = `
 
-          <div>
+        <tr>
 
-            <strong>
-              Order #${escapeHtml(
-                order.order_number ||
-                order.id?.slice(0, 8) ||
-                ""
-              )}
-            </strong>
+          <td colspan="5">
+            No orders have been placed yet.
+          </td>
 
-            <span>
-              ${
+        </tr>
+
+      `;
+
+      return;
+
+    }
+
+
+    ordersBody.innerHTML =
+      orders.map((order) => {
+
+        const orderNumber =
+          order.order_number ||
+          order.id?.slice(0, 8) ||
+          "";
+
+
+        const status =
+          order.status ||
+          "Processing";
+
+
+        const total =
+          Number(
+            order.total || 0
+          ).toFixed(2);
+
+
+        const date =
+          order.created_at
+            ? new Date(
                 order.created_at
-                  ? new Date(
-                      order.created_at
-                    ).toLocaleDateString(
-                      "en-GB"
-                    )
-                  : ""
-              }
-            </span>
-
-          </div>
+              ).toLocaleDateString(
+                "en-GB"
+              )
+            : "";
 
 
-          <div>
+        return `
 
-            £${Number(
-              order.total || 0
-            ).toFixed(2)}
+          <tr>
 
-          </div>
+            <td>
+              #${escapeHtml(
+                orderNumber
+              )}
+            </td>
 
+            <td>
+              ${escapeHtml(
+                order.company_name ||
+                order.company_id ||
+                "—"
+              )}
+            </td>
 
-          <div>
+            <td>
+              ${escapeHtml(status)}
+            </td>
 
-            ${escapeHtml(
-              order.status ||
-              "Processing"
-            )}
+            <td>
+              £${total}
+            </td>
 
-          </div>
+            <td>
+              ${escapeHtml(date)}
+            </td>
 
-        </div>
+          </tr>
 
-      `).join("");
+        `;
+
+      }).join("");
+
 
   } catch (error) {
 
@@ -1655,12 +2225,20 @@ async function loadAdminOrders() {
     );
 
 
-    container.innerHTML = `
-      <div class="empty-state">
-        <p>Unable to load orders.</p>
-      </div>
+    ordersBody.innerHTML = `
+
+      <tr>
+
+        <td colspan="5">
+          Unable to load orders.
+        </td>
+
+      </tr>
+
     `;
+
   }
+
 }
 
 
@@ -1673,6 +2251,7 @@ async function loadAdminCompanies() {
   const container =
     $("adminCompanies");
 
+
   if (!container) return;
 
 
@@ -1681,29 +2260,38 @@ async function loadAdminCompanies() {
     const {
       data: companies,
       error
-    } = await supabase
-      .from("companies")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    } =
+      await supabase
+        .from("companies")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
 
-    if (!companies?.length) {
+    if (
+      !companies ||
+      companies.length === 0
+    ) {
 
       container.innerHTML = `
+
         <div class="empty-state">
-          <p>No companies have been added yet.</p>
+          No companies have been added yet.
         </div>
+
       `;
 
       return;
+
     }
 
 
@@ -1734,6 +2322,7 @@ async function loadAdminCompanies() {
 
       `).join("");
 
+
   } catch (error) {
 
     console.error(
@@ -1743,66 +2332,34 @@ async function loadAdminCompanies() {
 
 
     container.innerHTML = `
+
       <div class="empty-state">
-        <p>Unable to load companies.</p>
+        Unable to load companies.
       </div>
+
     `;
+
   }
+
 }
 
 
 /* =========================================================
-   CUSTOMER PANEL NAVIGATION
+   ADMIN LOGOUT
 ========================================================= */
 
-document
-  .querySelectorAll(
-    "[data-customer-panel]"
-  )
-  .forEach((button) => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const panel =
-          button.dataset.customerPanel;
-
-        if (panel) {
-          showPanel(panel);
-        }
-
-      }
-    );
-
-  });
+const adminLogout =
+  $("adminLogout");
 
 
-/* =========================================================
-   ADMIN PANEL NAVIGATION
-========================================================= */
+if (adminLogout) {
 
-document
-  .querySelectorAll(
-    "[data-admin-panel]"
-  )
-  .forEach((button) => {
+  adminLogout.addEventListener(
+    "click",
+    logout
+  );
 
-    button.addEventListener(
-      "click",
-      () => {
-
-        const panel =
-          button.dataset.adminPanel;
-
-        if (panel) {
-          showPanel(panel);
-        }
-
-      }
-    );
-
-  });
+}
 
 
 /* =========================================================
@@ -1815,7 +2372,9 @@ async function logout() {
 
     const {
       error
-    } = await supabase.auth.signOut();
+    } =
+      await supabase.auth.signOut();
+
 
     if (error) {
 
@@ -1826,12 +2385,14 @@ async function logout() {
 
     }
 
+
   } catch (error) {
 
     console.error(
       "Logout error:",
       error
     );
+
 
   } finally {
 
@@ -1843,28 +2404,18 @@ async function logout() {
 
     currentMembership = null;
 
+
     authMode = "login";
 
+
     setAuthMode("login");
+
 
     showPanel("authPanel");
 
   }
+
 }
-
-
-document
-  .querySelectorAll(
-    "[data-logout], #logoutButton, #adminLogout"
-  )
-  .forEach((button) => {
-
-    button.addEventListener(
-      "click",
-      logout
-    );
-
-  });
 
 
 /* =========================================================
@@ -1894,6 +2445,8 @@ supabase.auth.onAuthStateChange(
 
       currentMembership = null;
 
+      setAuthMode("login");
+
       showPanel("authPanel");
 
     }
@@ -1909,21 +2462,26 @@ supabase.auth.onAuthStateChange(
 const enquiryForm =
   $("enquiryForm");
 
+
 if (enquiryForm) {
 
   enquiryForm.addEventListener(
     "submit",
-    async () => {
+    async (event) => {
+
+      /*
+        This currently allows the existing form
+        handling / Netlify handling to continue.
+      */
 
       const submitButton =
-        enquiryForm.querySelector(
-          'button[type="submit"]'
-        );
+        $("enquirySubmit");
 
 
       if (submitButton) {
 
-        submitButton.disabled = true;
+        submitButton.disabled =
+          true;
 
         submitButton.textContent =
           "SENDING...";
@@ -1932,16 +2490,17 @@ if (enquiryForm) {
 
     }
   );
+
 }
 
 
 /* =========================================================
-   SCROLL / HEADER EFFECT
+   HEADER SCROLL EFFECT
 ========================================================= */
 
 const header =
   document.querySelector(
-    "header"
+    ".nav"
   );
 
 
@@ -1963,6 +2522,7 @@ function updateHeader() {
     );
 
   }
+
 }
 
 
@@ -1992,35 +2552,6 @@ document
       "click",
       (event) => {
 
-        /*
-          Do NOT let the smooth-scroll handler
-          interfere with MY ACCOUNT.
-        */
-
-        const text =
-          link.textContent
-            .trim()
-            .replace(/\s+/g, " ")
-            .toUpperCase();
-
-
-        const isPortalLink =
-          link.matches(
-            "[data-open-portal], #portalButton, #accountButton, #myAccount, #myAccountButton"
-          );
-
-
-        if (
-          isPortalLink ||
-          text === "MY ACCOUNT" ||
-          text.includes("MY ACCOUNT")
-        ) {
-
-          return;
-
-        }
-
-
         const targetId =
           link.getAttribute("href");
 
@@ -2035,24 +2566,10 @@ document
         }
 
 
-        let target = null;
-
-        try {
-
-          target =
-            document.querySelector(
-              targetId
-            );
-
-        } catch (error) {
-
-          console.warn(
-            "Invalid smooth-scroll target:",
+        const target =
+          document.querySelector(
             targetId
           );
-
-          return;
-        }
 
 
         if (!target) return;
@@ -2073,24 +2590,47 @@ document
 
 
 /* =========================================================
-   SUPABASE INITIALISATION
+   APPLICATION INITIALISATION
 ========================================================= */
 
 (async function initialiseApp() {
 
   try {
 
+    /*
+      Invitation links must be processed first.
+    */
+
     if (isInvitationLink()) {
 
       await handleInvitationFlow();
 
       return;
+
     }
 
 
+    /*
+      Check whether a user is already logged in.
+    */
+
     const {
-      data
-    } = await supabase.auth.getSession();
+      data,
+      error
+    } =
+      await supabase.auth.getSession();
+
+
+    if (error) {
+
+      console.error(
+        "Initial session error:",
+        error
+      );
+
+      return;
+
+    }
 
 
     if (data?.session?.user) {
@@ -2099,6 +2639,7 @@ document
         data.session.user;
 
     }
+
 
   } catch (error) {
 
