@@ -26,7 +26,6 @@ function openModal() {
   if (!modal) return;
 
   modal.classList.add("open");
-
   document.body.style.overflow = "hidden";
 }
 
@@ -46,7 +45,6 @@ function openPortal() {
   if (!portal) return;
 
   portal.classList.add("show");
-
   document.body.style.overflow = "hidden";
 
   checkCurrentUser();
@@ -178,7 +176,6 @@ $("mobileEnquire")?.addEventListener(
   () => {
 
     closeMobileMenu();
-
     openModal();
 
   }
@@ -350,7 +347,7 @@ $("toggleAuth")?.addEventListener(
         "Already have an account? Sign in";
 
       $("signupNameField")
-        .classList
+        ?.classList
         .remove("hidden");
 
     } else {
@@ -370,7 +367,7 @@ $("toggleAuth")?.addEventListener(
         "Need an account? Create one";
 
       $("signupNameField")
-        .classList
+        ?.classList
         .add("hidden");
 
     }
@@ -406,7 +403,6 @@ $("authForm")?.addEventListener(
 
 
     button.disabled = true;
-
     message.textContent = "";
 
 
@@ -625,55 +621,97 @@ async function loadUser() {
 ========================================================= */
 
 async function loadCustomerPortal() {
+
   try {
+
     if (!currentUser) {
-      throw new Error("No authenticated user found.");
+      throw new Error(
+        "No authenticated user found."
+      );
     }
 
-    // ---------------------------------------------------------
-    // 1. Load the user's company membership
-    // ---------------------------------------------------------
 
-    const { data: membership, error: membershipError } = await supabase
-      .from("company_members")
-      .select("id, company_id, role")
-      .eq("user_id", currentUser.id)
-      .maybeSingle();
+    /* -------------------------------------------------------
+       1. LOAD COMPANY MEMBERSHIP
+    ------------------------------------------------------- */
+
+    const {
+      data: membership,
+      error: membershipError
+    } =
+      await supabase
+        .from("company_members")
+        .select(
+          "id, company_id, role"
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        )
+        .maybeSingle();
+
 
     if (membershipError) {
+
       console.error(
         "[The Gesture Co.] Company membership error:",
         membershipError
       );
 
       throw membershipError;
+
     }
 
+
+    /* -------------------------------------------------------
+       NO COMPANY
+    ------------------------------------------------------- */
+
     if (!membership) {
+
       currentCompany = null;
       currentMembership = null;
 
-      document.getElementById("customerWelcome").textContent =
-        `Welcome, ${currentProfile?.full_name || "there"}.`;
 
-      document.getElementById("companyDetails").innerHTML = `
+      $("customerWelcome").textContent =
+        `Welcome, ${
+          currentProfile?.full_name ||
+          "there"
+        }.`;
+
+      $("companyDetails").innerHTML = `
         <div class="notice">
           Your account is not currently connected to a company.
           Please contact The Gesture Co. to have your account connected.
         </div>
       `;
 
-      document.getElementById("activeOrders").textContent = "0";
-      document.getElementById("totalOrders").textContent = "0";
-      document.getElementById("teamUsers").textContent = "0";
 
-      document.getElementById("ordersBody").innerHTML = "";
-      document.getElementById("teamList").innerHTML = "";
+      $("activeOrders").textContent =
+        "0";
+
+      $("totalOrders").textContent =
+        "0";
+
+      $("teamUsers").textContent =
+        "0";
+
+
+      $("ordersBody").innerHTML =
+        "";
+
+      $("teamList").innerHTML =
+        "";
+
 
       return;
+
     }
 
-    currentMembership = membership;
+
+    currentMembership =
+      membership;
+
 
     console.log(
       "[The Gesture Co.] Company membership loaded:",
@@ -681,41 +719,57 @@ async function loadCustomerPortal() {
     );
 
 
-    // ---------------------------------------------------------
-    // 2. Load the company separately
-    // ---------------------------------------------------------
+    /* -------------------------------------------------------
+       2. LOAD COMPANY SEPARATELY
+    ------------------------------------------------------- */
 
-    const { data: company, error: companyError } = await supabase
-      .from("companies")
-      .select(`
-        id,
-        name,
-        contact_email,
-        phone,
-        address_line_1,
-        address_line_2,
-        city,
-        postcode
-      `)
-      .eq("id", membership.company_id)
-      .maybeSingle();
+    const {
+      data: company,
+      error: companyError
+    } =
+      await supabase
+        .from("companies")
+        .select(`
+          id,
+          name,
+          contact_email,
+          phone,
+          address_line_1,
+          address_line_2,
+          city,
+          postcode
+        `)
+        .eq(
+          "id",
+          membership.company_id
+        )
+        .maybeSingle();
+
 
     if (companyError) {
+
       console.error(
         "[The Gesture Co.] Company details error:",
         companyError
       );
 
       throw companyError;
+
     }
 
+
     if (!company) {
+
       throw new Error(
         "The company membership exists, but the company record could not be loaded."
       );
+
     }
 
-    currentCompany = company;
+
+    currentCompany =
+      company;
+
 
     console.log(
       "[The Gesture Co.] Company loaded:",
@@ -723,66 +777,102 @@ async function loadCustomerPortal() {
     );
 
 
-    // ---------------------------------------------------------
-    // 3. Welcome message
-    // ---------------------------------------------------------
+    /* -------------------------------------------------------
+       3. WELCOME
+    ------------------------------------------------------- */
 
-    document.getElementById("customerWelcome").textContent =
-      `Welcome, ${currentProfile?.full_name || "there"}.`;
+    $("customerWelcome").textContent =
+      `Welcome, ${
+        currentProfile?.full_name ||
+        "there"
+      }.`;
 
 
-    // ---------------------------------------------------------
-    // 4. Company details
-    // ---------------------------------------------------------
+
+    /* -------------------------------------------------------
+       4. COMPANY DETAILS
+    ------------------------------------------------------- */
 
     const addressParts = [
+
       company.address_line_1,
+
       company.address_line_2,
+
       company.city,
+
       company.postcode
+
     ].filter(Boolean);
 
-    document.getElementById("companyDetails").innerHTML = `
+
+    $("companyDetails").innerHTML = `
+
       <div>
-        <strong>${escapeHtml(company.name || "")}</strong>
+        <strong>
+          ${escapeHtml(
+            company.name || ""
+          )}
+        </strong>
       </div>
 
       ${
         company.contact_email
-          ? `<div>${escapeHtml(company.contact_email)}</div>`
+          ? `
+            <div>
+              ${escapeHtml(
+                company.contact_email
+              )}
+            </div>
+          `
           : ""
       }
 
       ${
         company.phone
-          ? `<div>${escapeHtml(company.phone)}</div>`
+          ? `
+            <div>
+              ${escapeHtml(
+                company.phone
+              )}
+            </div>
+          `
           : ""
       }
 
       ${
         addressParts.length
-          ? `<div>${addressParts.map(escapeHtml).join("<br>")}</div>`
+          ? `
+            <div>
+              ${addressParts
+                .map(escapeHtml)
+                .join("<br>")}
+            </div>
+          `
           : ""
       }
 
       <div class="company-role">
-        Your role: ${escapeHtml(
-          currentMembership.role || "member"
+        Your role:
+        ${escapeHtml(
+          currentMembership.role ||
+          "member"
         )}
       </div>
+
     `;
 
 
-    // ---------------------------------------------------------
-    // 5. Load orders
-    // ---------------------------------------------------------
+    /* -------------------------------------------------------
+       5. LOAD ORDERS
+    ------------------------------------------------------- */
 
     await loadCustomerOrders();
 
 
-    // ---------------------------------------------------------
-    // 6. Load company team
-    // ---------------------------------------------------------
+    /* -------------------------------------------------------
+       6. LOAD TEAM
+    ------------------------------------------------------- */
 
     await loadCompanyTeam();
 
@@ -794,159 +884,43 @@ async function loadCustomerPortal() {
       error
     );
 
-    document.getElementById("companyDetails").innerHTML = `
-      <div class="error">
-        Unable to load your company details.
-      </div>
-    `;
 
-    document.getElementById("ordersBody").innerHTML = "";
-    document.getElementById("teamList").innerHTML = "";
+    if ($("companyDetails")) {
 
-    document.getElementById("activeOrders").textContent = "0";
-    document.getElementById("totalOrders").textContent = "0";
-    document.getElementById("teamUsers").textContent = "0";
-  }
-}
+      $("companyDetails").innerHTML = `
+        <div class="error">
+          Unable to load your company details.
+        </div>
+      `;
 
-  $("customerWelcome").textContent =
-    `Welcome${
-      currentProfile?.full_name
-        ? ", " + currentProfile.full_name
-        : ""
-    }.`;
-
-  currentCompany = null;
-  currentMembership = null;
+    }
 
 
-  const {
-    data: membership,
-    error
-  } =
-    await supabase
-      .from("company_members")
-      .select(`
-        id,
-        company_id,
-        role,
-        companies (
-          id,
-          name,
-          contact_email,
-          phone,
-          address_line_1,
-          address_line_2,
-          city,
-          postcode
-        )
-      `)
-      .eq(
-        "user_id",
-        currentUser.id
-      )
-      .maybeSingle();
+    if ($("ordersBody")) {
+      $("ordersBody").innerHTML = "";
+    }
 
 
-  if (error) {
+    if ($("teamList")) {
+      $("teamList").innerHTML = "";
+    }
 
-    console.error(
-      "Company membership error:",
-      error
-    );
 
-    $("companyDetails").innerHTML =
-      `<div class="error-message">
-        Unable to load your company details.
-      </div>`;
+    if ($("activeOrders")) {
+      $("activeOrders").textContent = "0";
+    }
 
-    return;
+
+    if ($("totalOrders")) {
+      $("totalOrders").textContent = "0";
+    }
+
+
+    if ($("teamUsers")) {
+      $("teamUsers").textContent = "0";
+    }
 
   }
-
-
-  if (!membership) {
-
-    $("companyDetails").innerHTML = `
-      <div class="notice">
-        Your account has been created, but it has not yet been connected to a company.
-        Please contact The Gesture Co. to finish setting up your account.
-      </div>
-    `;
-
-    $("activeOrders").textContent =
-      "0";
-
-    $("totalOrders").textContent =
-      "0";
-
-    $("teamUsers").textContent =
-      "0";
-
-    $("ordersBody").innerHTML = "";
-
-    $("teamList").innerHTML = "";
-
-    return;
-
-  }
-
-
-  currentMembership =
-    membership;
-
-  currentCompany =
-    membership.companies;
-
-
-  if (!currentCompany) {
-
-    $("companyDetails").innerHTML =
-      `<div class="error-message">
-        Your company could not be found.
-      </div>`;
-
-    return;
-
-  }
-
-
-  $("companyDetails").innerHTML = `
-
-    <div>
-
-      <span class="small-label">
-        COMPANY
-      </span>
-
-      <strong>
-        ${escapeHtml(
-          currentCompany.name
-        )}
-      </strong>
-
-    </div>
-
-    <div>
-
-      <span class="small-label">
-        ROLE
-      </span>
-
-      <strong>
-        ${escapeHtml(
-          membership.role || "Member"
-        )}
-      </strong>
-
-    </div>
-
-  `;
-
-
-  await loadCustomerOrders();
-
-  await loadCompanyTeam();
 
 }
 
@@ -1012,6 +986,7 @@ async function loadCustomerOrders() {
       error
     );
 
+
     $("ordersBody").innerHTML = `
       <tr>
         <td colspan="5">
@@ -1019,6 +994,7 @@ async function loadCustomerOrders() {
         </td>
       </tr>
     `;
+
 
     return;
 
@@ -1071,118 +1047,136 @@ async function loadCustomerOrders() {
 
 
   $("ordersBody").innerHTML =
-    orderList.map(order => {
+    orderList
+      .map(order => {
 
-      const shipment =
-        Array.isArray(order.shipments)
-          ? order.shipments[0]
-          : order.shipments;
-
-
-      const invoice =
-        Array.isArray(order.invoices)
-          ? order.invoices[0]
-          : order.invoices;
+        const shipment =
+          Array.isArray(
+            order.shipments
+          )
+            ? order.shipments[0]
+            : order.shipments;
 
 
-      let delivery = "—";
+        const invoice =
+          Array.isArray(
+            order.invoices
+          )
+            ? order.invoices[0]
+            : order.invoices;
 
 
-      if (shipment?.delivered_at) {
-
-        delivery =
-          `Delivered ${formatDate(
-            shipment.delivered_at
-          )}`;
-
-      } else if (
-        shipment?.estimated_delivery
-      ) {
-
-        delivery =
-          `Expected ${formatDate(
-            shipment.estimated_delivery
-          )}`;
-
-      } else if (
-        shipment?.tracking_url
-      ) {
-
-        delivery = `
-          <a
-            class="tracking-link"
-            href="${escapeHtml(
-              shipment.tracking_url
-            )}"
-            target="_blank"
-            rel="noopener">
-            TRACK DELIVERY
-          </a>
-        `;
-
-      }
+        let delivery =
+          "—";
 
 
-      let invoiceHtml = "—";
+        if (
+          shipment?.delivered_at
+        ) {
+
+          delivery =
+            `Delivered ${
+              formatDate(
+                shipment.delivered_at
+              )
+            }`;
+
+        } else if (
+          shipment?.estimated_delivery
+        ) {
+
+          delivery =
+            `Expected ${
+              formatDate(
+                shipment.estimated_delivery
+              )
+            }`;
+
+        } else if (
+          shipment?.tracking_url
+        ) {
+
+          delivery = `
+            <a
+              class="tracking-link"
+              href="${escapeHtml(
+                shipment.tracking_url
+              )}"
+              target="_blank"
+              rel="noopener">
+              TRACK DELIVERY
+            </a>
+          `;
+
+        }
 
 
-      if (invoice?.file_path) {
-
-        invoiceHtml = `
-          <button
-            class="btn small"
-            data-invoice="${escapeHtml(
-              invoice.file_path
-            )}">
-            DOWNLOAD
-          </button>
-        `;
-
-      }
+        let invoiceHtml =
+          "—";
 
 
-      return `
+        if (
+          invoice?.file_path
+        ) {
 
-        <tr>
+          invoiceHtml = `
+            <button
+              class="btn small"
+              data-invoice="${escapeHtml(
+                invoice.file_path
+              )}">
+              DOWNLOAD
+            </button>
+          `;
 
-          <td>
-            #TG-${escapeHtml(
-              order.order_number
-            )}
-          </td>
+        }
 
-          <td>
-            <span class="status">
-              ${escapeHtml(
-                order.status ||
-                "Processing"
+
+        return `
+
+          <tr>
+
+            <td>
+              #TG-${escapeHtml(
+                order.order_number
               )}
-            </span>
-          </td>
+            </td>
 
-          <td>
-            ${money(
-              order.total_amount
-            )}
-          </td>
+            <td>
+              <span class="status">
+                ${escapeHtml(
+                  order.status ||
+                  "Processing"
+                )}
+              </span>
+            </td>
 
-          <td>
-            ${delivery}
-          </td>
+            <td>
+              ${money(
+                order.total_amount
+              )}
+            </td>
 
-          <td>
-            ${invoiceHtml}
-          </td>
+            <td>
+              ${delivery}
+            </td>
 
-        </tr>
+            <td>
+              ${invoiceHtml}
+            </td>
 
-      `;
+          </tr>
 
-    }).join("");
+        `;
+
+      })
+      .join("");
 
 
   document
-    .querySelectorAll("[data-invoice]")
+    .querySelectorAll(
+      "[data-invoice]"
+    )
     .forEach(button => {
 
       button.addEventListener(
@@ -1248,6 +1242,7 @@ async function downloadInvoice(
       error
     );
 
+
     alert(
       "We couldn't open the invoice. Please contact The Gesture Co."
     );
@@ -1297,10 +1292,12 @@ async function loadCompanyTeam() {
       error
     );
 
+
     $("teamList").innerHTML =
       `<div class="error-message">
         Unable to load team.
       </div>`;
+
 
     return;
 
@@ -1326,49 +1323,52 @@ async function loadCompanyTeam() {
 
 
   $("teamList").innerHTML =
-    list.map(member => {
+    list
+      .map(member => {
 
-      const profile =
-        Array.isArray(
-          member.profiles
-        )
-          ? member.profiles[0]
-          : member.profiles;
+        const profile =
+          Array.isArray(
+            member.profiles
+          )
+            ? member.profiles[0]
+            : member.profiles;
 
 
-      return `
+        return `
 
-        <div class="team-member">
+          <div class="team-member">
 
-          <div>
+            <div>
 
-            <strong>
+              <strong>
+                ${escapeHtml(
+                  profile?.full_name ||
+                  "Team member"
+                )}
+              </strong>
+
+              <span>
+                ${escapeHtml(
+                  profile?.email ||
+                  ""
+                )}
+              </span>
+
+            </div>
+
+            <small>
               ${escapeHtml(
-                profile?.full_name ||
-                "Team member"
+                member.role ||
+                "Member"
               )}
-            </strong>
-
-            <span>
-              ${escapeHtml(
-                profile?.email || ""
-              )}
-            </span>
+            </small>
 
           </div>
 
-          <small>
-            ${escapeHtml(
-              member.role ||
-              "Member"
-            )}
-          </small>
+        `;
 
-        </div>
-
-      `;
-
-    }).join("");
+      })
+      .join("");
 
 }
 
@@ -1452,7 +1452,11 @@ $("inviteButton")?.addEventListener(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Invitation error:",
+        error
+      );
+
 
       $("inviteMessage").innerHTML =
         `<div class="error-message">
@@ -1481,9 +1485,15 @@ $("inviteButton")?.addEventListener(
 async function logout() {
 
   try {
+
     await supabase.auth.signOut();
+
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      error
+    );
+
   }
 
 
@@ -1498,21 +1508,27 @@ async function logout() {
   $("authTitle").textContent =
     "Welcome back.";
 
+
   $("authSubtitle").textContent =
     "Sign in to manage your company, orders and documents.";
+
 
   $("authSubmit").textContent =
     "SIGN IN";
 
+
   $("toggleAuth").textContent =
     "Need an account? Create one";
+
 
   $("signupNameField")
     ?.classList
     .add("hidden");
 
 
-  showPanel("authPanel");
+  showPanel(
+    "authPanel"
+  );
 
 }
 
@@ -1521,6 +1537,7 @@ $("customerLogout")?.addEventListener(
   "click",
   logout
 );
+
 
 $("adminLogout")?.addEventListener(
   "click",
@@ -1566,12 +1583,16 @@ async function loadAdminProducts() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     $("adminProducts").innerHTML =
       `<div class="error-message">
         Unable to load products.
       </div>`;
+
 
     return;
 
@@ -1589,67 +1610,74 @@ async function loadAdminProducts() {
 
 
   $("adminProducts").innerHTML =
-    products.map(product => `
+    products
+      .map(product => `
 
-      <div class="product-item">
+        <div class="product-item">
 
-        ${
-          product.image_url
-            ? `
-              <img
-                src="${escapeHtml(
-                  product.image_url
-                )}"
-                alt="${escapeHtml(
-                  product.name
-                )}">
-            `
-            : ""
-        }
-
-        <strong>
-          ${escapeHtml(
-            product.name
-          )}
-        </strong>
-
-        <span>
-          ${money(
-            product.price
-          )}
-        </span>
-
-        <small>
-          ${escapeHtml(
-            product.category ||
-            "Product"
-          )}
-        </small>
-
-        <small>
           ${
-            product.active
-              ? "ACTIVE"
-              : "INACTIVE"
+            product.image_url
+              ? `
+                <img
+                  src="${escapeHtml(
+                    product.image_url
+                  )}"
+                  alt="${escapeHtml(
+                    product.name
+                  )}">
+              `
+              : ""
           }
-        </small>
 
-        <button
-          class="btn small product-toggle"
-          data-product-id="${escapeHtml(
-            product.id
-          )}"
-          data-active="${product.active}">
-          ${
-            product.active
-              ? "DEACTIVATE"
-              : "ACTIVATE"
-          }
-        </button>
 
-      </div>
+          <strong>
+            ${escapeHtml(
+              product.name
+            )}
+          </strong>
 
-    `).join("");
+
+          <span>
+            ${money(
+              product.price
+            )}
+          </span>
+
+
+          <small>
+            ${escapeHtml(
+              product.category ||
+              "Product"
+            )}
+          </small>
+
+
+          <small>
+            ${
+              product.active
+                ? "ACTIVE"
+                : "INACTIVE"
+            }
+          </small>
+
+
+          <button
+            class="btn small product-toggle"
+            data-product-id="${escapeHtml(
+              product.id
+            )}"
+            data-active="${product.active}">
+            ${
+              product.active
+                ? "DEACTIVATE"
+                : "ACTIVATE"
+            }
+          </button>
+
+        </div>
+
+      `)
+      .join("");
 
 
   document
@@ -1664,6 +1692,7 @@ async function loadAdminProducts() {
 
           const productId =
             button.dataset.productId;
+
 
           const currentlyActive =
             button.dataset.active ===
@@ -1708,11 +1737,15 @@ async function updateProductStatus(
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     alert(
       "Unable to update product."
     );
+
 
     return;
 
@@ -1797,7 +1830,8 @@ $("productForm")?.addEventListener(
         </div>`;
 
 
-      let imageUrl = null;
+      let imageUrl =
+        null;
 
 
       if (image) {
@@ -1825,7 +1859,8 @@ $("productForm")?.addEventListener(
               {
                 cacheControl:
                   "3600",
-                upsert: false,
+                upsert:
+                  false,
                 contentType:
                   image.type
               }
@@ -1877,7 +1912,8 @@ $("productForm")?.addEventListener(
             image_url:
               imageUrl,
 
-            active: true
+            active:
+              true
 
           });
 
@@ -1888,6 +1924,7 @@ $("productForm")?.addEventListener(
 
 
       $("productForm").reset();
+
 
       $("productMinimum").value =
         "1";
@@ -1904,7 +1941,10 @@ $("productForm")?.addEventListener(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        error
+      );
+
 
       $("productMessage").innerHTML =
         `<div class="error-message">
@@ -1953,7 +1993,10 @@ async function loadAdminOrders() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     $("adminOrdersBody").innerHTML = `
       <tr>
@@ -1962,6 +2005,7 @@ async function loadAdminOrders() {
         </td>
       </tr>
     `;
+
 
     return;
 
@@ -2055,12 +2099,16 @@ async function loadAdminCompanies() {
 
   if (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     $("adminCompanies").innerHTML =
       `<div class="error-message">
         Unable to load companies.
       </div>`;
+
 
     return;
 
@@ -2082,45 +2130,48 @@ async function loadAdminCompanies() {
     <div class="company-admin-list">
 
       ${
-        companies.map(company => `
+        companies
+          .map(company => `
 
-          <div class="company-admin-item">
+            <div class="company-admin-item">
 
-            <div>
+              <div>
 
-              <strong>
+                <strong>
+                  ${escapeHtml(
+                    company.name
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHtml(
+                    company.contact_email ||
+                    "No email"
+                  )}
+                </span>
+
+              </div>
+
+              <small>
                 ${escapeHtml(
-                  company.name
+                  company.city ||
+                  ""
                 )}
-              </strong>
 
-              <span>
-                ${escapeHtml(
-                  company.contact_email ||
-                  "No email"
-                )}
-              </span>
+                ${
+                  company.postcode
+                    ? " · " +
+                      escapeHtml(
+                        company.postcode
+                      )
+                    : ""
+                }
+              </small>
 
             </div>
 
-            <small>
-              ${escapeHtml(
-                company.city || ""
-              )}
-
-              ${
-                company.postcode
-                  ? " · " +
-                    escapeHtml(
-                      company.postcode
-                    )
-                  : ""
-              }
-            </small>
-
-          </div>
-
-        `).join("")
+          `)
+          .join("")
       }
 
     </div>
@@ -2258,7 +2309,9 @@ document.addEventListener(
 
       },
       {
-        threshold: 0.12,
+        threshold:
+          0.12,
+
         rootMargin:
           "0px 0px -40px 0px"
       }
@@ -2266,7 +2319,8 @@ document.addEventListener(
 
 
   revealEls.forEach(
-    el => io.observe(el)
+    el =>
+      io.observe(el)
   );
 
 })();
