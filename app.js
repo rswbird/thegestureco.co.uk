@@ -625,6 +625,189 @@ async function loadUser() {
 ========================================================= */
 
 async function loadCustomerPortal() {
+  try {
+    if (!currentUser) {
+      throw new Error("No authenticated user found.");
+    }
+
+    // ---------------------------------------------------------
+    // 1. Load the user's company membership
+    // ---------------------------------------------------------
+
+    const { data: membership, error: membershipError } = await supabase
+      .from("company_members")
+      .select("id, company_id, role")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (membershipError) {
+      console.error(
+        "[The Gesture Co.] Company membership error:",
+        membershipError
+      );
+
+      throw membershipError;
+    }
+
+    if (!membership) {
+      currentCompany = null;
+      currentMembership = null;
+
+      document.getElementById("customerWelcome").textContent =
+        `Welcome, ${currentProfile?.full_name || "there"}.`;
+
+      document.getElementById("companyDetails").innerHTML = `
+        <div class="notice">
+          Your account is not currently connected to a company.
+          Please contact The Gesture Co. to have your account connected.
+        </div>
+      `;
+
+      document.getElementById("activeOrders").textContent = "0";
+      document.getElementById("totalOrders").textContent = "0";
+      document.getElementById("teamUsers").textContent = "0";
+
+      document.getElementById("ordersBody").innerHTML = "";
+      document.getElementById("teamList").innerHTML = "";
+
+      return;
+    }
+
+    currentMembership = membership;
+
+    console.log(
+      "[The Gesture Co.] Company membership loaded:",
+      membership
+    );
+
+
+    // ---------------------------------------------------------
+    // 2. Load the company separately
+    // ---------------------------------------------------------
+
+    const { data: company, error: companyError } = await supabase
+      .from("companies")
+      .select(`
+        id,
+        name,
+        contact_email,
+        phone,
+        address_line_1,
+        address_line_2,
+        city,
+        postcode
+      `)
+      .eq("id", membership.company_id)
+      .maybeSingle();
+
+    if (companyError) {
+      console.error(
+        "[The Gesture Co.] Company details error:",
+        companyError
+      );
+
+      throw companyError;
+    }
+
+    if (!company) {
+      throw new Error(
+        "The company membership exists, but the company record could not be loaded."
+      );
+    }
+
+    currentCompany = company;
+
+    console.log(
+      "[The Gesture Co.] Company loaded:",
+      company
+    );
+
+
+    // ---------------------------------------------------------
+    // 3. Welcome message
+    // ---------------------------------------------------------
+
+    document.getElementById("customerWelcome").textContent =
+      `Welcome, ${currentProfile?.full_name || "there"}.`;
+
+
+    // ---------------------------------------------------------
+    // 4. Company details
+    // ---------------------------------------------------------
+
+    const addressParts = [
+      company.address_line_1,
+      company.address_line_2,
+      company.city,
+      company.postcode
+    ].filter(Boolean);
+
+    document.getElementById("companyDetails").innerHTML = `
+      <div>
+        <strong>${escapeHtml(company.name || "")}</strong>
+      </div>
+
+      ${
+        company.contact_email
+          ? `<div>${escapeHtml(company.contact_email)}</div>`
+          : ""
+      }
+
+      ${
+        company.phone
+          ? `<div>${escapeHtml(company.phone)}</div>`
+          : ""
+      }
+
+      ${
+        addressParts.length
+          ? `<div>${addressParts.map(escapeHtml).join("<br>")}</div>`
+          : ""
+      }
+
+      <div class="company-role">
+        Your role: ${escapeHtml(
+          currentMembership.role || "member"
+        )}
+      </div>
+    `;
+
+
+    // ---------------------------------------------------------
+    // 5. Load orders
+    // ---------------------------------------------------------
+
+    await loadCustomerOrders();
+
+
+    // ---------------------------------------------------------
+    // 6. Load company team
+    // ---------------------------------------------------------
+
+    await loadCompanyTeam();
+
+
+  } catch (error) {
+
+    console.error(
+      "[The Gesture Co.] Customer portal error:",
+      error
+    );
+
+    document.getElementById("companyDetails").innerHTML = `
+      <div class="error">
+        Unable to load your company details.
+      </div>
+    `;
+
+    document.getElementById("ordersBody").innerHTML = "";
+    document.getElementById("teamList").innerHTML = "";
+
+    document.getElementById("activeOrders").textContent = "0";
+    document.getElementById("totalOrders").textContent = "0";
+    document.getElementById("teamUsers").textContent = "0";
+  }
+}
 
   $("customerWelcome").textContent =
     `Welcome${
