@@ -1387,6 +1387,10 @@ $("inviteButton")?.addEventListener(
         .trim();
 
 
+    /* -------------------------------------------------------
+       VALIDATE EMAIL
+    ------------------------------------------------------- */
+
     if (!email) {
 
       $("inviteMessage").innerHTML =
@@ -1398,6 +1402,10 @@ $("inviteButton")?.addEventListener(
 
     }
 
+
+    /* -------------------------------------------------------
+       VALIDATE COMPANY
+    ------------------------------------------------------- */
 
     if (!currentCompany?.id) {
 
@@ -1419,13 +1427,75 @@ $("inviteButton")?.addEventListener(
       $("inviteButton").textContent =
         "SENDING...";
 
+      $("inviteMessage").innerHTML =
+        `<div class="notice">
+          Preparing invitation...
+        </div>`;
+
+
+      /* -----------------------------------------------------
+         GET CURRENT SUPABASE SESSION
+      ----------------------------------------------------- */
 
       const {
+        data: sessionData,
+        error: sessionError
+      } =
+        await supabase.auth.getSession();
+
+
+      if (sessionError) {
+
+        console.error(
+          "[The Gesture Co.] Session error:",
+          sessionError
+        );
+
+        throw new Error(
+          "Unable to verify your login session."
+        );
+
+      }
+
+
+      const session =
+        sessionData?.session;
+
+
+      if (!session?.access_token) {
+
+        console.error(
+          "[The Gesture Co.] No Supabase access token found."
+        );
+
+        throw new Error(
+          "Your login session has expired. Please sign out and sign back in."
+        );
+
+      }
+
+
+      console.log(
+        "[The Gesture Co.] Valid Supabase session found."
+      );
+
+
+      /* -----------------------------------------------------
+         CALL INVITATION EDGE FUNCTION
+      ----------------------------------------------------- */
+
+      const {
+        data,
         error
       } =
         await supabase.functions.invoke(
           "invite-company-member",
           {
+            headers: {
+              Authorization:
+                `Bearer ${session.access_token}`
+            },
+
             body: {
               email,
               company_id:
@@ -1435,14 +1505,40 @@ $("inviteButton")?.addEventListener(
         );
 
 
+      /* -----------------------------------------------------
+         HANDLE EDGE FUNCTION ERROR
+      ----------------------------------------------------- */
+
       if (error) {
+
+        console.error(
+          "[The Gesture Co.] Invitation function error:",
+          error
+        );
+
         throw error;
+
       }
+
+
+      /* -----------------------------------------------------
+         SUCCESS
+      ----------------------------------------------------- */
+
+      console.log(
+        "[The Gesture Co.] Invitation response:",
+        data
+      );
 
 
       $("inviteMessage").innerHTML =
         `<div class="success-message">
-          Invitation sent successfully.
+          ${
+            escapeHtml(
+              data?.message ||
+              "Invitation sent successfully."
+            )
+          }
         </div>`;
 
 
@@ -1450,19 +1546,39 @@ $("inviteButton")?.addEventListener(
         "";
 
 
+      /* Refresh team list in case an existing
+         account was added immediately. */
+
+      await loadCompanyTeam();
+
+
     } catch (error) {
 
       console.error(
-        "Invitation error:",
+        "[The Gesture Co.] Invitation error:",
         error
       );
 
 
+      let message =
+        "We couldn't send the invitation yet. Please try again later.";
+
+
+      if (
+        error?.message
+      ) {
+
+        message =
+          error.message;
+
+      }
+
+
       $("inviteMessage").innerHTML =
         `<div class="error-message">
-          We couldn't send the invitation yet.
-          Please try again later.
+          ${escapeHtml(message)}
         </div>`;
+
 
     } finally {
 
@@ -1476,7 +1592,6 @@ $("inviteButton")?.addEventListener(
 
   }
 );
-
 
 /* =========================================================
    LOGOUT
