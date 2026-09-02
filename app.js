@@ -107,7 +107,10 @@ document.querySelectorAll("#mobileNav a").forEach((link) => {
 ========================================================= */
 
 function openPortal() {
-  if (!portal) return;
+  if (!portal) {
+    console.error("[Portal] #portal element not found.");
+    return;
+  }
 
   portal.classList.add("show");
   document.body.style.overflow = "hidden";
@@ -124,12 +127,37 @@ function closePortal() {
 }
 
 
-const portalOpenButtons = document.querySelectorAll(
-  "[data-open-portal], #portalButton"
-);
+/*
+   IMPORTANT:
+   Use delegated click handling so MY ACCOUNT works whether
+   the HTML uses a button, anchor, ID, or data attribute.
+*/
 
-portalOpenButtons.forEach((button) => {
-  button.addEventListener("click", openPortal);
+document.addEventListener("click", (event) => {
+  const element = event.target.closest("a, button");
+
+  if (!element) return;
+
+  const text = element.textContent
+    .trim()
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+
+  const isPortalButton =
+    element.matches(
+      "[data-open-portal], #portalButton, #accountButton, #myAccount, #myAccountButton"
+    );
+
+  const isMyAccountText =
+    text === "MY ACCOUNT" ||
+    text.includes("MY ACCOUNT");
+
+  if (isPortalButton || isMyAccountText) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    openPortal();
+  }
 });
 
 
@@ -318,11 +346,15 @@ if (authForm) {
       }
 
     } catch (error) {
-      console.error("Authentication error:", error);
+      console.error(
+        "Authentication error:",
+        error
+      );
 
       showMessage(
         message,
-        error.message || "Something went wrong. Please try again.",
+        error.message ||
+          "Something went wrong. Please try again.",
         "error"
       );
 
@@ -369,15 +401,8 @@ async function handleInvitationFlow() {
       window.location.search
     );
 
-    const tokenHash = searchParams.get("token_hash");
-
-    /*
-      Supabase invitation links can contain:
-
-      ?token_hash=...&type=invite
-
-      If a token hash is present, explicitly verify it.
-    */
+    const tokenHash =
+      searchParams.get("token_hash");
 
     if (tokenHash) {
       const { data, error } =
@@ -394,7 +419,8 @@ async function handleInvitationFlow() {
 
         showPanel("authPanel");
 
-        const authMessage = $("authMessage");
+        const authMessage =
+          $("authMessage");
 
         showMessage(
           authMessage,
@@ -410,11 +436,6 @@ async function handleInvitationFlow() {
       }
     }
 
-    /*
-      Supabase may already have processed the invitation
-      URL and created a session.
-    */
-
     const {
       data: sessionData
     } = await supabase.auth.getSession();
@@ -426,7 +447,8 @@ async function handleInvitationFlow() {
     if (!invitedUser) {
       showPanel("authPanel");
 
-      const authMessage = $("authMessage");
+      const authMessage =
+        $("authMessage");
 
       showMessage(
         authMessage,
@@ -439,15 +461,6 @@ async function handleInvitationFlow() {
 
     currentUser = invitedUser;
 
-    /*
-      Open the portal directly.
-
-      IMPORTANT:
-      Do NOT call openPortal() here because openPortal()
-      calls checkCurrentUser(), which would call this function
-      again.
-    */
-
     if (portal) {
       portal.classList.add("show");
       document.body.style.overflow = "hidden";
@@ -455,7 +468,8 @@ async function handleInvitationFlow() {
 
     showPanel("invitePasswordPanel");
 
-    const emailField = $("invitePasswordEmail");
+    const emailField =
+      $("invitePasswordEmail");
 
     if (emailField) {
       emailField.value =
@@ -472,7 +486,8 @@ async function handleInvitationFlow() {
 
     showPanel("authPanel");
 
-    const authMessage = $("authMessage");
+    const authMessage =
+      $("authMessage");
 
     showMessage(
       authMessage,
@@ -496,6 +511,7 @@ if (invitePasswordForm) {
   invitePasswordForm.addEventListener(
     "submit",
     async (event) => {
+
       event.preventDefault();
 
       const password =
@@ -580,11 +596,6 @@ if (invitePasswordForm) {
           "success"
         );
 
-        /*
-          Give Supabase a moment to finish updating
-          the session before loading the portal.
-        */
-
         await new Promise((resolve) =>
           setTimeout(resolve, 700)
         );
@@ -622,9 +633,6 @@ if (invitePasswordForm) {
 
 async function checkCurrentUser() {
   try {
-    /*
-      Check invitation before normal login flow.
-    */
 
     if (isInvitationLink()) {
       const handled =
@@ -643,15 +651,20 @@ async function checkCurrentUser() {
     if (error) throw error;
 
     if (data.session?.user) {
-      currentUser = data.session.user;
+
+      currentUser =
+        data.session.user;
 
       await loadUser();
 
     } else {
+
       showPanel("authPanel");
+
     }
 
   } catch (error) {
+
     console.error(
       "Session error:",
       error
@@ -667,12 +680,14 @@ async function checkCurrentUser() {
 ========================================================= */
 
 async function loadUser() {
+
   if (!currentUser) {
     showPanel("authPanel");
     return;
   }
 
   try {
+
     const {
       data: profile,
       error: profileError
@@ -689,26 +704,26 @@ async function loadUser() {
       );
     }
 
-    currentProfile = profile || null;
+    currentProfile =
+      profile || null;
 
-    /*
-      Admin users get the admin portal.
-    */
+    if (
+      currentProfile?.is_admin === true
+    ) {
 
-    if (currentProfile?.is_admin === true) {
       await loadAdminPortal();
+
       showPanel("adminPanel");
+
       return;
     }
 
-    /*
-      Normal users get the customer portal.
-    */
-
     await loadCustomerPortal();
+
     showPanel("customerPanel");
 
   } catch (error) {
+
     console.error(
       "Load user error:",
       error
@@ -733,12 +748,10 @@ async function loadUser() {
 ========================================================= */
 
 async function loadCustomerPortal() {
+
   if (!currentUser) return;
 
   try {
-    /*
-      Load company membership.
-    */
 
     const {
       data: membership,
@@ -746,24 +759,26 @@ async function loadCustomerPortal() {
     } = await supabase
       .from("company_members")
       .select("*")
-      .eq("user_id", currentUser.id)
+      .eq(
+        "user_id",
+        currentUser.id
+      )
       .maybeSingle();
 
     if (membershipError) {
+
       console.error(
         "Membership loading error:",
         membershipError
       );
+
     }
 
     currentMembership =
       membership || null;
 
-    /*
-      Load company.
-    */
-
     if (currentMembership?.company_id) {
+
       const {
         data: company,
         error: companyError
@@ -777,36 +792,36 @@ async function loadCustomerPortal() {
         .maybeSingle();
 
       if (companyError) {
+
         console.error(
           "Company loading error:",
           companyError
         );
+
       }
 
       currentCompany =
         company || null;
-    } else {
-      currentCompany = null;
-    }
 
-    /*
-      Populate dashboard.
-    */
+    } else {
+
+      currentCompany = null;
+
+    }
 
     populateCustomerDetails();
 
-    /*
-      Load orders and team.
-    */
-
     await loadCustomerOrders();
+
     await loadCompanyTeam();
 
   } catch (error) {
+
     console.error(
       "Customer portal error:",
       error
     );
+
   }
 }
 
@@ -816,6 +831,7 @@ async function loadCustomerPortal() {
 ========================================================= */
 
 function populateCustomerDetails() {
+
   const userName =
     currentProfile?.full_name ||
     currentUser?.user_metadata?.full_name ||
@@ -829,9 +845,6 @@ function populateCustomerDetails() {
     currentCompany?.name ||
     "No company linked";
 
-  /*
-    Common customer portal fields.
-  */
 
   const nameElements = [
     $("customerName"),
@@ -840,10 +853,13 @@ function populateCustomerDetails() {
   ];
 
   nameElements.forEach((element) => {
+
     if (element) {
       element.textContent = userName;
     }
+
   });
+
 
   const emailElements = [
     $("customerEmail"),
@@ -851,10 +867,13 @@ function populateCustomerDetails() {
   ];
 
   emailElements.forEach((element) => {
+
     if (element) {
       element.textContent = userEmail;
     }
+
   });
+
 
   const companyElements = [
     $("customerCompany"),
@@ -863,14 +882,13 @@ function populateCustomerDetails() {
   ];
 
   companyElements.forEach((element) => {
+
     if (element) {
       element.textContent = companyName;
     }
+
   });
 
-  /*
-    Input fields.
-  */
 
   const nameInput =
     $("profileNameInput");
@@ -879,6 +897,7 @@ function populateCustomerDetails() {
     nameInput.value = userName;
   }
 
+
   const emailInput =
     $("profileEmailInput");
 
@@ -886,12 +905,15 @@ function populateCustomerDetails() {
     emailInput.value = userEmail;
   }
 
+
   const companyInput =
     $("companyNameInput");
 
   if (companyInput) {
+
     companyInput.value =
       currentCompany?.name || "";
+
   }
 }
 
@@ -901,6 +923,7 @@ function populateCustomerDetails() {
 ========================================================= */
 
 async function loadCustomerOrders() {
+
   if (!currentUser) return;
 
   const ordersContainer =
@@ -908,16 +931,21 @@ async function loadCustomerOrders() {
 
   if (!ordersContainer) return;
 
+
   if (!currentCompany?.id) {
+
     ordersContainer.innerHTML = `
       <div class="empty-state">
         <p>No company account is linked to your account yet.</p>
       </div>
     `;
+
     return;
   }
 
+
   try {
+
     const {
       data: orders,
       error
@@ -937,7 +965,12 @@ async function loadCustomerOrders() {
 
     if (error) throw error;
 
-    if (!orders || orders.length === 0) {
+
+    if (
+      !orders ||
+      orders.length === 0
+    ) {
+
       ordersContainer.innerHTML = `
         <div class="empty-state">
           <p>You don't have any orders yet.</p>
@@ -947,13 +980,16 @@ async function loadCustomerOrders() {
       return;
     }
 
+
     ordersContainer.innerHTML =
       orders.map((order) => `
+
         <div class="order-card">
 
           <div class="order-card-top">
 
             <div>
+
               <strong>
                 Order #${escapeHtml(
                   order.order_number ||
@@ -963,40 +999,53 @@ async function loadCustomerOrders() {
               </strong>
 
               <span>
-                ${order.created_at
-                  ? new Date(
-                      order.created_at
-                    ).toLocaleDateString(
-                      "en-GB"
-                    )
-                  : ""}
+                ${
+                  order.created_at
+                    ? new Date(
+                        order.created_at
+                      ).toLocaleDateString(
+                        "en-GB"
+                      )
+                    : ""
+                }
               </span>
+
             </div>
 
+
             <div>
+
               <span class="status">
                 ${escapeHtml(
                   order.status ||
                   "Processing"
                 )}
               </span>
+
             </div>
 
           </div>
 
+
           <div class="order-card-bottom">
 
             <div>
+
               <small>Total</small>
+
               <strong>
                 £${Number(
                   order.total || 0
                 ).toFixed(2)}
               </strong>
+
             </div>
 
+
             <div>
+
               <small>Delivery</small>
+
               <strong>
                 ${escapeHtml(
                   order.tracking_status ||
@@ -1004,14 +1053,17 @@ async function loadCustomerOrders() {
                   "Processing"
                 )}
               </strong>
+
             </div>
 
           </div>
 
         </div>
+
       `).join("");
 
   } catch (error) {
+
     console.error(
       "Customer orders error:",
       error
@@ -1031,12 +1083,17 @@ async function loadCustomerOrders() {
 ========================================================= */
 
 async function loadCompanyTeam() {
+
   if (!currentCompany?.id) {
+
     renderCompanyTeam([]);
+
     return;
   }
 
+
   try {
+
     const {
       data: members,
       error
@@ -1065,11 +1122,13 @@ async function loadCompanyTeam() {
 
     if (error) throw error;
 
+
     renderCompanyTeam(
       members || []
     );
 
   } catch (error) {
+
     console.error(
       "Company team error:",
       error
@@ -1085,12 +1144,15 @@ async function loadCompanyTeam() {
 ========================================================= */
 
 function renderCompanyTeam(members) {
+
   const teamContainer =
     $("companyTeam");
 
   if (!teamContainer) return;
 
+
   if (!members.length) {
+
     teamContainer.innerHTML = `
       <div class="empty-state">
         <p>No employees have been added yet.</p>
@@ -1099,6 +1161,7 @@ function renderCompanyTeam(members) {
 
     return;
   }
+
 
   teamContainer.innerHTML =
     members.map((member) => {
@@ -1115,7 +1178,9 @@ function renderCompanyTeam(members) {
         profile.email ||
         "";
 
+
       return `
+
         <div class="team-member">
 
           <div class="team-member-info">
@@ -1130,14 +1195,19 @@ function renderCompanyTeam(members) {
 
           </div>
 
+
           <div class="team-member-role">
+
             ${escapeHtml(
               member.role || "buyer"
             )}
+
           </div>
 
         </div>
+
       `;
+
     }).join("");
 }
 
@@ -1168,31 +1238,42 @@ if (inviteEmployeeForm) {
       const submitButton =
         $("inviteEmployeeSubmit");
 
+
       if (!email) {
+
         showMessage(
           message,
           "Please enter an employee email address.",
           "error"
         );
+
         return;
       }
 
+
       if (!currentCompany?.id) {
+
         showMessage(
           message,
           "Your account is not linked to a company.",
           "error"
         );
+
         return;
       }
+
 
       try {
 
         if (submitButton) {
+
           submitButton.disabled = true;
+
           submitButton.textContent =
             "SENDING...";
+
         }
+
 
         const {
           data: sessionData
@@ -1201,26 +1282,35 @@ if (inviteEmployeeForm) {
         const accessToken =
           sessionData?.session?.access_token;
 
+
         if (!accessToken) {
+
           throw new Error(
             "You must be signed in to invite an employee."
           );
+
         }
+
 
         const {
           data: userData,
           error: userError
         } = await supabase.auth.getUser();
 
+
         if (userError) {
           throw userError;
         }
 
+
         if (!userData?.user) {
+
           throw new Error(
             "You must be signed in to invite an employee."
           );
+
         }
+
 
         const {
           data,
@@ -1233,6 +1323,7 @@ if (inviteEmployeeForm) {
               company_id:
                 currentCompany.id
             },
+
             headers: {
               Authorization:
                 `Bearer ${accessToken}`
@@ -1240,18 +1331,23 @@ if (inviteEmployeeForm) {
           }
         );
 
+
         if (error) {
           throw error;
         }
+
 
         if (
           data &&
           data.error
         ) {
+
           throw new Error(
             data.error
           );
+
         }
+
 
         showMessage(
           message,
@@ -1259,9 +1355,11 @@ if (inviteEmployeeForm) {
           "success"
         );
 
+
         if ($("employeeEmail")) {
           $("employeeEmail").value = "";
         }
+
 
         await loadCompanyTeam();
 
@@ -1271,6 +1369,7 @@ if (inviteEmployeeForm) {
           "Employee invitation error:",
           error
         );
+
 
         showMessage(
           message,
@@ -1282,11 +1381,16 @@ if (inviteEmployeeForm) {
       } finally {
 
         if (submitButton) {
+
           submitButton.disabled = false;
+
           submitButton.textContent =
             "INVITE EMPLOYEE";
+
         }
+
       }
+
     }
   );
 }
@@ -1297,10 +1401,13 @@ if (inviteEmployeeForm) {
 ========================================================= */
 
 async function loadAdminPortal() {
+
   populateAdminDetails();
 
   await loadAdminProducts();
+
   await loadAdminOrders();
+
   await loadAdminCompanies();
 }
 
@@ -1310,6 +1417,7 @@ async function loadAdminPortal() {
 ========================================================= */
 
 function populateAdminDetails() {
+
   const name =
     currentProfile?.full_name ||
     currentUser?.email ||
@@ -1319,25 +1427,31 @@ function populateAdminDetails() {
     currentUser?.email ||
     "";
 
+
   const nameElements = [
     $("adminName"),
     $("adminDashboardName")
   ];
 
   nameElements.forEach((element) => {
+
     if (element) {
       element.textContent = name;
     }
+
   });
+
 
   const emailElements = [
     $("adminEmail")
   ];
 
   emailElements.forEach((element) => {
+
     if (element) {
       element.textContent = email;
     }
+
   });
 }
 
@@ -1347,10 +1461,12 @@ function populateAdminDetails() {
 ========================================================= */
 
 async function loadAdminProducts() {
+
   const container =
     $("adminProducts");
 
   if (!container) return;
+
 
   try {
 
@@ -1367,9 +1483,12 @@ async function loadAdminProducts() {
         }
       );
 
+
     if (error) throw error;
 
+
     if (!products?.length) {
+
       container.innerHTML = `
         <div class="empty-state">
           <p>No products have been added yet.</p>
@@ -1379,31 +1498,41 @@ async function loadAdminProducts() {
       return;
     }
 
+
     container.innerHTML =
       products.map((product) => `
+
         <div class="admin-product">
 
           <div>
+
             <strong>
               ${escapeHtml(
-                product.name || "Product"
+                product.name ||
+                "Product"
               )}
             </strong>
 
             <span>
               ${escapeHtml(
-                product.category || ""
+                product.category ||
+                ""
               )}
             </span>
+
           </div>
 
+
           <div>
+
             £${Number(
               product.price || 0
             ).toFixed(2)}
+
           </div>
 
         </div>
+
       `).join("");
 
   } catch (error) {
@@ -1412,6 +1541,7 @@ async function loadAdminProducts() {
       "Admin products error:",
       error
     );
+
 
     container.innerHTML = `
       <div class="empty-state">
@@ -1427,10 +1557,12 @@ async function loadAdminProducts() {
 ========================================================= */
 
 async function loadAdminOrders() {
+
   const container =
     $("adminOrders");
 
   if (!container) return;
+
 
   try {
 
@@ -1447,9 +1579,12 @@ async function loadAdminOrders() {
         }
       );
 
+
     if (error) throw error;
 
+
     if (!orders?.length) {
+
       container.innerHTML = `
         <div class="empty-state">
           <p>No orders have been placed yet.</p>
@@ -1459,11 +1594,14 @@ async function loadAdminOrders() {
       return;
     }
 
+
     container.innerHTML =
       orders.map((order) => `
+
         <div class="admin-order">
 
           <div>
+
             <strong>
               Order #${escapeHtml(
                 order.order_number ||
@@ -1473,30 +1611,40 @@ async function loadAdminOrders() {
             </strong>
 
             <span>
-              ${order.created_at
-                ? new Date(
-                    order.created_at
-                  ).toLocaleDateString(
-                    "en-GB"
-                  )
-                : ""}
+              ${
+                order.created_at
+                  ? new Date(
+                      order.created_at
+                    ).toLocaleDateString(
+                      "en-GB"
+                    )
+                  : ""
+              }
             </span>
+
           </div>
 
+
           <div>
+
             £${Number(
               order.total || 0
             ).toFixed(2)}
+
           </div>
 
+
           <div>
+
             ${escapeHtml(
               order.status ||
               "Processing"
             )}
+
           </div>
 
         </div>
+
       `).join("");
 
   } catch (error) {
@@ -1505,6 +1653,7 @@ async function loadAdminOrders() {
       "Admin orders error:",
       error
     );
+
 
     container.innerHTML = `
       <div class="empty-state">
@@ -1520,10 +1669,12 @@ async function loadAdminOrders() {
 ========================================================= */
 
 async function loadAdminCompanies() {
+
   const container =
     $("adminCompanies");
 
   if (!container) return;
+
 
   try {
 
@@ -1540,9 +1691,12 @@ async function loadAdminCompanies() {
         }
       );
 
+
     if (error) throw error;
 
+
     if (!companies?.length) {
+
       container.innerHTML = `
         <div class="empty-state">
           <p>No companies have been added yet.</p>
@@ -1552,11 +1706,14 @@ async function loadAdminCompanies() {
       return;
     }
 
+
     container.innerHTML =
       companies.map((company) => `
+
         <div class="admin-company">
 
           <div>
+
             <strong>
               ${escapeHtml(
                 company.name ||
@@ -1570,9 +1727,11 @@ async function loadAdminCompanies() {
                 ""
               )}
             </span>
+
           </div>
 
         </div>
+
       `).join("");
 
   } catch (error) {
@@ -1581,6 +1740,7 @@ async function loadAdminCompanies() {
       "Admin companies error:",
       error
     );
+
 
     container.innerHTML = `
       <div class="empty-state">
@@ -1650,6 +1810,7 @@ document
 ========================================================= */
 
 async function logout() {
+
   try {
 
     const {
@@ -1657,10 +1818,12 @@ async function logout() {
     } = await supabase.auth.signOut();
 
     if (error) {
+
       console.error(
         "Logout error:",
         error
       );
+
     }
 
   } catch (error) {
@@ -1673,8 +1836,11 @@ async function logout() {
   } finally {
 
     currentUser = null;
+
     currentProfile = null;
+
     currentCompany = null;
+
     currentMembership = null;
 
     authMode = "login";
@@ -1713,24 +1879,23 @@ supabase.auth.onAuthStateChange(
       event
     );
 
+
     currentUser =
       session?.user || null;
 
-    /*
-      Don't automatically reload the entire portal
-      on every auth event.
-
-      Invitation password setup is handled separately.
-    */
 
     if (
       event === "SIGNED_OUT"
     ) {
+
       currentProfile = null;
+
       currentCompany = null;
+
       currentMembership = null;
 
       showPanel("authPanel");
+
     }
 
   }
@@ -1748,22 +1913,21 @@ if (enquiryForm) {
 
   enquiryForm.addEventListener(
     "submit",
-    async (event) => {
-
-      /*
-        Netlify Forms handles this form.
-        We only provide UI feedback here.
-      */
+    async () => {
 
       const submitButton =
         enquiryForm.querySelector(
           'button[type="submit"]'
         );
 
+
       if (submitButton) {
+
         submitButton.disabled = true;
+
         submitButton.textContent =
           "SENDING...";
+
       }
 
     }
@@ -1780,18 +1944,24 @@ const header =
     "header"
   );
 
+
 function updateHeader() {
 
   if (!header) return;
 
+
   if (window.scrollY > 30) {
+
     header.classList.add(
       "scrolled"
     );
+
   } else {
+
     header.classList.remove(
       "scrolled"
     );
+
   }
 }
 
@@ -1803,6 +1973,7 @@ window.addEventListener(
     passive: true
   }
 );
+
 
 updateHeader();
 
@@ -1821,24 +1992,74 @@ document
       "click",
       (event) => {
 
+        /*
+          Do NOT let the smooth-scroll handler
+          interfere with MY ACCOUNT.
+        */
+
+        const text =
+          link.textContent
+            .trim()
+            .replace(/\s+/g, " ")
+            .toUpperCase();
+
+
+        const isPortalLink =
+          link.matches(
+            "[data-open-portal], #portalButton, #accountButton, #myAccount, #myAccountButton"
+          );
+
+
+        if (
+          isPortalLink ||
+          text === "MY ACCOUNT" ||
+          text.includes("MY ACCOUNT")
+        ) {
+
+          return;
+
+        }
+
+
         const targetId =
           link.getAttribute("href");
+
 
         if (
           !targetId ||
           targetId === "#"
         ) {
+
           return;
+
         }
 
-        const target =
-          document.querySelector(
+
+        let target = null;
+
+        try {
+
+          target =
+            document.querySelector(
+              targetId
+            );
+
+        } catch (error) {
+
+          console.warn(
+            "Invalid smooth-scroll target:",
             targetId
           );
 
+          return;
+        }
+
+
         if (!target) return;
 
+
         event.preventDefault();
+
 
         target.scrollIntoView({
           behavior: "smooth",
@@ -1859,11 +2080,6 @@ document
 
   try {
 
-    /*
-      If the page was opened directly from a Supabase
-      invitation email, process the invitation first.
-    */
-
     if (isInvitationLink()) {
 
       await handleInvitationFlow();
@@ -1871,18 +2087,17 @@ document
       return;
     }
 
-    /*
-      Otherwise make sure any existing session is
-      available for the portal.
-    */
 
     const {
       data
     } = await supabase.auth.getSession();
 
+
     if (data?.session?.user) {
+
       currentUser =
         data.session.user;
+
     }
 
   } catch (error) {
