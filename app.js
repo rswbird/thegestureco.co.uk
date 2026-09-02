@@ -1462,6 +1462,44 @@ $("inviteButton")?.addEventListener(
         sessionData?.session;
 
 
+      /* -----------------------------------------------------
+         VERIFY SESSION WITH SUPABASE AUTH SERVER
+      ----------------------------------------------------- */
+
+      const {
+        data: userData,
+        error: userError
+      } =
+        await supabase.auth.getUser();
+
+
+      console.log(
+        "[The Gesture Co.] Auth validation:",
+        {
+          userId:
+            userData?.user?.id ||
+            null,
+
+          email:
+            userData?.user?.email ||
+            null,
+
+          error:
+            userError ||
+            null
+        }
+      );
+
+
+      if (userError) {
+
+        throw new Error(
+          "Supabase could not validate your login session. Please sign out and sign back in."
+        );
+
+      }
+
+
       if (!session?.access_token) {
 
         console.error(
@@ -1592,6 +1630,7 @@ $("inviteButton")?.addEventListener(
 
   }
 );
+
 
 /* =========================================================
    LOGOUT
