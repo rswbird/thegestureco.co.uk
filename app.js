@@ -22,19 +22,28 @@ const portal = $("portal");
 
 
 function showMessage(element, message, type = "") {
+
   if (!element) return;
 
   element.textContent = message;
+
   element.className = "auth-message";
 
   if (type) {
     element.classList.add(type);
   }
+
 }
 
 
 function escapeHtml(value) {
-  if (value === null || value === undefined) return "";
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "";
+  }
 
   return String(value)
     .replace(/&/g, "&amp;")
@@ -42,6 +51,7 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 }
 
 
@@ -50,41 +60,68 @@ function escapeHtml(value) {
 ========================================================= */
 
 function openModal() {
+
   if (!modal) return;
 
   modal.classList.add("show");
+
   document.body.style.overflow = "hidden";
+
 }
 
 
 function closeModal() {
+
   if (!modal) return;
 
   modal.classList.remove("show");
+
   document.body.style.overflow = "";
+
 }
 
 
 /* Close buttons */
 
-document.querySelectorAll("[data-close-modal]").forEach((button) => {
-  button.addEventListener("click", closeModal);
-});
+document
+  .querySelectorAll("[data-close-modal]")
+  .forEach((button) => {
+
+    button.addEventListener(
+      "click",
+      closeModal
+    );
+
+  });
 
 
-const closeModalButton = $("closeModal");
+const closeModalButton =
+  $("closeModal");
+
 
 if (closeModalButton) {
-  closeModalButton.addEventListener("click", closeModal);
+
+  closeModalButton.addEventListener(
+    "click",
+    closeModal
+  );
+
 }
 
 
 if (modal) {
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeModal();
+
+  modal.addEventListener(
+    "click",
+    (event) => {
+
+      if (event.target === modal) {
+        closeModal();
+      }
+
     }
-  });
+  );
+
 }
 
 
@@ -93,7 +130,9 @@ if (modal) {
 ========================================================= */
 
 function openEnquiry() {
+
   openModal();
+
 }
 
 
@@ -108,12 +147,18 @@ function openEnquiry() {
 
   const button = $(id);
 
-  if (button) {
-    button.addEventListener("click", (event) => {
+  if (!button) return;
+
+  button.addEventListener(
+    "click",
+    (event) => {
+
       event.preventDefault();
+
       openEnquiry();
-    });
-  }
+
+    }
+  );
 
 });
 
@@ -122,45 +167,69 @@ function openEnquiry() {
    MOBILE NAVIGATION
 ========================================================= */
 
-const menuButton = $("menuButton");
-const mobileMenu = $("mobileMenu");
+const menuButton =
+  $("menuButton");
+
+const mobileMenu =
+  $("mobileMenu");
 
 
-if (menuButton && mobileMenu) {
+if (
+  menuButton &&
+  mobileMenu
+) {
 
-  menuButton.addEventListener("click", () => {
+  menuButton.addEventListener(
+    "click",
+    () => {
 
-    const isOpen =
-      mobileMenu.classList.toggle("show");
+      const isOpen =
+        mobileMenu.classList.toggle(
+          "show"
+        );
 
-    menuButton.setAttribute(
-      "aria-expanded",
-      isOpen ? "true" : "false"
-    );
+      menuButton.setAttribute(
+        "aria-expanded",
+        isOpen
+          ? "true"
+          : "false"
+      );
 
-  });
+    }
+  );
 
 }
 
 
 document
-  .querySelectorAll("#mobileMenu a")
+  .querySelectorAll(
+    "#mobileMenu a"
+  )
   .forEach((link) => {
 
-    link.addEventListener("click", () => {
+    link.addEventListener(
+      "click",
+      () => {
 
-      if (mobileMenu) {
-        mobileMenu.classList.remove("show");
+        if (mobileMenu) {
+
+          mobileMenu.classList.remove(
+            "show"
+          );
+
+        }
+
+        if (menuButton) {
+
+          menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+          );
+
+        }
+
       }
-
-      if (menuButton) {
-        menuButton.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-      }
-
-    });
+    );
 
   });
 
@@ -172,17 +241,22 @@ document
 function openPortal() {
 
   if (!portal) {
+
     console.error(
       "[Portal] #portal was not found."
     );
+
     return;
+
   }
 
   portal.classList.add("show");
 
-  document.body.style.overflow = "hidden";
+  document.body.style.overflow =
+    "hidden";
 
   checkCurrentUser();
+
 }
 
 
@@ -192,14 +266,19 @@ function closePortal() {
 
   portal.classList.remove("show");
 
-  document.body.style.overflow = "";
+  document.body.style.overflow =
+    "";
 
 }
 
 
-/* MY ACCOUNT */
+/* =========================================================
+   MY ACCOUNT
+========================================================= */
 
-const accountButton = $("accountButton");
+const accountButton =
+  $("accountButton");
+
 
 if (accountButton) {
 
@@ -217,10 +296,13 @@ if (accountButton) {
 }
 
 
-/* Close portal */
+/* =========================================================
+   CLOSE PORTAL
+========================================================= */
 
 const portalCloseButton =
   $("portalClose");
+
 
 if (portalCloseButton) {
 
@@ -239,7 +321,9 @@ if (portal) {
     (event) => {
 
       if (event.target === portal) {
+
         closePortal();
+
       }
 
     }
@@ -258,7 +342,9 @@ function showPanel(id) {
     .querySelectorAll(".portal-panel")
     .forEach((panel) => {
 
-      panel.classList.remove("active");
+      panel.classList.remove(
+        "active"
+      );
 
     });
 
@@ -266,7 +352,11 @@ function showPanel(id) {
   const panel = $(id);
 
   if (panel) {
-    panel.classList.add("active");
+
+    panel.classList.add(
+      "active"
+    );
+
   }
 
 }
@@ -350,6 +440,7 @@ function setAuthMode(mode) {
   const message =
     $("authMessage");
 
+
   if (message) {
 
     message.textContent = "";
@@ -368,6 +459,7 @@ function setAuthMode(mode) {
 
 const toggleAuth =
   $("toggleAuth");
+
 
 if (toggleAuth) {
 
@@ -405,17 +497,21 @@ if (authForm) {
 
 
       const email =
-        $("authEmail")?.value
+        $("authEmail")
+          ?.value
           .trim()
           .toLowerCase();
 
 
       const password =
-        $("authPassword")?.value;
+        $("authPassword")
+          ?.value;
 
 
       const fullName =
-        $("signupName")?.value.trim();
+        $("signupName")
+          ?.value
+          .trim();
 
 
       const message =
@@ -435,6 +531,7 @@ if (authForm) {
         );
 
         return;
+
       }
 
 
@@ -450,6 +547,7 @@ if (authForm) {
         );
 
         return;
+
       }
 
 
@@ -513,7 +611,8 @@ if (authForm) {
               options: {
 
                 data: {
-                  full_name: fullName
+                  full_name:
+                    fullName
                 }
 
               }
@@ -527,7 +626,10 @@ if (authForm) {
 
 
           if (data.user) {
-            currentUser = data.user;
+
+            currentUser =
+              data.user;
+
           }
 
 
@@ -575,7 +677,8 @@ if (authForm) {
 
         if (submitButton) {
 
-          submitButton.disabled = false;
+          submitButton.disabled =
+            false;
 
           submitButton.textContent =
             authMode === "login"
@@ -606,13 +709,16 @@ function isInvitationLink() {
 
   const hashParams =
     new URLSearchParams(
-      window.location.hash.replace(/^#/, "")
+      window.location.hash
+        .replace(/^#/, "")
     );
 
 
   return (
-    searchParams.get("type") === "invite" ||
-    hashParams.get("type") === "invite"
+    searchParams.get("type") ===
+      "invite" ||
+    hashParams.get("type") ===
+      "invite"
   );
 
 }
@@ -633,7 +739,9 @@ async function handleInvitationFlow() {
 
 
     const tokenHash =
-      searchParams.get("token_hash");
+      searchParams.get(
+        "token_hash"
+      );
 
 
     if (tokenHash) {
@@ -661,7 +769,9 @@ async function handleInvitationFlow() {
         );
 
 
-        showPanel("authPanel");
+        showPanel(
+          "authPanel"
+        );
 
 
         showMessage(
@@ -677,7 +787,10 @@ async function handleInvitationFlow() {
 
 
       if (data?.user) {
-        currentUser = data.user;
+
+        currentUser =
+          data.user;
+
       }
 
     }
@@ -696,7 +809,9 @@ async function handleInvitationFlow() {
 
     if (!invitedUser) {
 
-      showPanel("authPanel");
+      showPanel(
+        "authPanel"
+      );
 
 
       showMessage(
@@ -717,7 +832,9 @@ async function handleInvitationFlow() {
 
     if (portal) {
 
-      portal.classList.add("show");
+      portal.classList.add(
+        "show"
+      );
 
       document.body.style.overflow =
         "hidden";
@@ -737,7 +854,8 @@ async function handleInvitationFlow() {
     if (emailField) {
 
       emailField.value =
-        invitedUser.email || "";
+        invitedUser.email ||
+        "";
 
     }
 
@@ -753,7 +871,9 @@ async function handleInvitationFlow() {
     );
 
 
-    showPanel("authPanel");
+    showPanel(
+      "authPanel"
+    );
 
 
     showMessage(
@@ -788,11 +908,13 @@ if (invitePasswordForm) {
 
 
       const password =
-        $("inviteNewPassword")?.value;
+        $("inviteNewPassword")
+          ?.value;
 
 
       const confirmPassword =
-        $("inviteConfirmPassword")?.value;
+        $("inviteConfirmPassword")
+          ?.value;
 
 
       const message =
@@ -815,6 +937,7 @@ if (invitePasswordForm) {
         );
 
         return;
+
       }
 
 
@@ -827,11 +950,13 @@ if (invitePasswordForm) {
         );
 
         return;
+
       }
 
 
       if (
-        password !== confirmPassword
+        password !==
+        confirmPassword
       ) {
 
         showMessage(
@@ -841,6 +966,7 @@ if (invitePasswordForm) {
         );
 
         return;
+
       }
 
 
@@ -868,12 +994,14 @@ if (invitePasswordForm) {
         );
 
         return;
+
       }
 
 
       if (submitButton) {
 
-        submitButton.disabled = true;
+        submitButton.disabled =
+          true;
 
         submitButton.textContent =
           "CREATING ACCOUNT...";
@@ -911,7 +1039,10 @@ if (invitePasswordForm) {
 
         await new Promise(
           (resolve) =>
-            setTimeout(resolve, 700)
+            setTimeout(
+              resolve,
+              700
+            )
         );
 
 
@@ -938,7 +1069,8 @@ if (invitePasswordForm) {
 
         if (submitButton) {
 
-          submitButton.disabled = false;
+          submitButton.disabled =
+            false;
 
           submitButton.textContent =
             "CREATE MY ACCOUNT";
@@ -996,9 +1128,13 @@ async function checkCurrentUser() {
 
     } else {
 
-      setAuthMode("login");
+      setAuthMode(
+        "login"
+      );
 
-      showPanel("authPanel");
+      showPanel(
+        "authPanel"
+      );
 
     }
 
@@ -1011,9 +1147,14 @@ async function checkCurrentUser() {
     );
 
 
-    setAuthMode("login");
+    setAuthMode(
+      "login"
+    );
 
-    showPanel("authPanel");
+
+    showPanel(
+      "authPanel"
+    );
 
   }
 
@@ -1028,7 +1169,9 @@ async function loadUser() {
 
   if (!currentUser) {
 
-    showPanel("authPanel");
+    showPanel(
+      "authPanel"
+    );
 
     return;
 
@@ -1066,12 +1209,15 @@ async function loadUser() {
 
 
     if (
-      currentProfile?.is_admin === true
+      currentProfile?.is_admin ===
+      true
     ) {
 
       await loadAdminPortal();
 
-      showPanel("adminPanel");
+      showPanel(
+        "adminPanel"
+      );
 
       return;
 
@@ -1080,7 +1226,9 @@ async function loadUser() {
 
     await loadCustomerPortal();
 
-    showPanel("customerPanel");
+    showPanel(
+      "customerPanel"
+    );
 
 
   } catch (error) {
@@ -1091,7 +1239,9 @@ async function loadUser() {
     );
 
 
-    showPanel("authPanel");
+    showPanel(
+      "authPanel"
+    );
 
 
     showMessage(
@@ -1144,7 +1294,9 @@ async function loadCustomerPortal() {
       membership || null;
 
 
-    if (currentMembership?.company_id) {
+    if (
+      currentMembership?.company_id
+    ) {
 
       const {
         data: company,
@@ -1187,6 +1339,7 @@ async function loadCustomerPortal() {
 
     await loadCompanyTeam();
 
+
   } catch (error) {
 
     console.error(
@@ -1213,7 +1366,8 @@ function populateCustomerDetails() {
 
 
   const userEmail =
-    currentUser?.email || "";
+    currentUser?.email ||
+    "";
 
 
   const companyName =
@@ -1346,86 +1500,92 @@ async function loadCustomerOrders() {
 
 
     ordersBody.innerHTML =
-      orders.map((order) => {
+      orders
+        .map((order) => {
 
-        const orderNumber =
-          order.order_number ||
-          order.id?.slice(0, 8) ||
-          "";
-
-
-        const status =
-          order.status ||
-          "Processing";
+          const orderNumber =
+            order.order_number ||
+            order.id?.slice(0, 8) ||
+            "";
 
 
-        const total =
-          Number(
-            order.total || 0
-          ).toFixed(2);
+          const status =
+            order.status ||
+            "Processing";
 
 
-        const date =
-          order.created_at
-            ? new Date(
-                order.created_at
-              ).toLocaleDateString(
-                "en-GB"
-              )
-            : "";
+          const total =
+            Number(
+              order.total || 0
+            ).toFixed(2);
 
 
-        const delivery =
-          order.tracking_status ||
-          status;
+          const date =
+            order.created_at
+              ? new Date(
+                  order.created_at
+                ).toLocaleDateString(
+                  "en-GB"
+                )
+              : "";
 
 
-        return `
+          const delivery =
+            order.tracking_status ||
+            status;
 
-          <tr>
 
-            <td>
-              <strong>
-                #${escapeHtml(
-                  orderNumber
+          return `
+
+            <tr>
+
+              <td>
+                <strong>
+                  #${escapeHtml(
+                    orderNumber
+                  )}
+                </strong>
+              </td>
+
+              <td>
+                ${escapeHtml(status)}
+              </td>
+
+              <td>
+                £${total}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  delivery
                 )}
-              </strong>
-            </td>
+              </td>
 
-            <td>
-              ${escapeHtml(status)}
-            </td>
+              <td>
 
-            <td>
-              £${total}
-            </td>
+                ${
+                  order.invoice_url
+                    ? `
+                      <a
+                        href="${escapeHtml(
+                          order.invoice_url
+                        )}"
+                        target="_blank"
+                        rel="noopener">
+                        DOWNLOAD
+                      </a>
+                    `
+                    : "—"
+                }
 
-            <td>
-              ${escapeHtml(delivery)}
-            </td>
+              </td>
 
-            <td>
-              ${
-                order.invoice_url
-                  ? `
-                    <a
-                      href="${escapeHtml(
-                        order.invoice_url
-                      )}"
-                      target="_blank"
-                      rel="noopener">
-                      DOWNLOAD
-                    </a>
-                  `
-                  : "—"
-              }
-            </td>
+            </tr>
 
-          </tr>
+          `;
 
-        `;
-
-      }).join("");
+        })
+        .join("");
 
 
   } catch (error) {
@@ -1457,7 +1617,9 @@ async function loadCustomerOrders() {
    CUSTOMER DASHBOARD STATS
 ========================================================= */
 
-function updateCustomerStats(orders) {
+function updateCustomerStats(
+  orders
+) {
 
   const totalOrders =
     $("totalOrders");
@@ -1478,21 +1640,23 @@ function updateCustomerStats(orders) {
   if (activeOrders) {
 
     const active =
-      orders.filter((order) => {
+      orders.filter(
+        (order) => {
 
-        const status =
-          String(
-            order.status || ""
-          ).toLowerCase();
+          const status =
+            String(
+              order.status || ""
+            ).toLowerCase();
 
 
-        return ![
-          "completed",
-          "delivered",
-          "cancelled"
-        ].includes(status);
+          return ![
+            "completed",
+            "delivered",
+            "cancelled"
+          ].includes(status);
 
-      }).length;
+        }
+      ).length;
 
 
     activeOrders.textContent =
@@ -1592,53 +1756,55 @@ async function loadCompanyTeam() {
 
 
     teamList.innerHTML =
-      members.map((member) => {
+      members
+        .map((member) => {
 
-        const profile =
-          member.profiles || {};
-
-
-        const name =
-          profile.full_name ||
-          profile.email ||
-          "Team member";
+          const profile =
+            member.profiles || {};
 
 
-        const email =
-          profile.email ||
-          "";
+          const name =
+            profile.full_name ||
+            profile.email ||
+            "Team member";
 
 
-        return `
+          const email =
+            profile.email ||
+            "";
 
-          <div class="team-member">
 
-            <div class="team-member-info">
+          return `
 
-              <strong>
-                ${escapeHtml(name)}
-              </strong>
+            <div class="team-member">
 
-              <span>
-                ${escapeHtml(email)}
-              </span>
+              <div class="team-member-info">
+
+                <strong>
+                  ${escapeHtml(name)}
+                </strong>
+
+                <span>
+                  ${escapeHtml(email)}
+                </span>
+
+              </div>
+
+              <div class="team-member-role">
+
+                ${escapeHtml(
+                  member.role ||
+                  "buyer"
+                )}
+
+              </div>
 
             </div>
 
+          `;
 
-            <div class="team-member-role">
-
-              ${escapeHtml(
-                member.role || "buyer"
-              )}
-
-            </div>
-
-          </div>
-
-        `;
-
-      }).join("");
+        })
+        .join("");
 
 
   } catch (error) {
@@ -1666,7 +1832,9 @@ async function loadCompanyTeam() {
    TEAM COUNT
 ========================================================= */
 
-function updateTeamCount(count) {
+function updateTeamCount(
+  count
+) {
 
   const teamUsers =
     $("teamUsers");
@@ -1700,7 +1868,8 @@ if (inviteButton) {
 
 
       const email =
-        $("inviteEmail")?.value
+        $("inviteEmail")
+          ?.value
           .trim()
           .toLowerCase();
 
@@ -1711,15 +1880,11 @@ if (inviteButton) {
 
       if (!email) {
 
-        if (message) {
-
-          message.textContent =
-            "Please enter an employee email address.";
-
-          message.className =
-            "auth-message error";
-
-        }
+        showMessage(
+          message,
+          "Please enter an employee email address.",
+          "error"
+        );
 
         return;
 
@@ -1728,15 +1893,11 @@ if (inviteButton) {
 
       if (!currentCompany?.id) {
 
-        if (message) {
-
-          message.textContent =
-            "Your account is not linked to a company.";
-
-          message.className =
-            "auth-message error";
-
-        }
+        showMessage(
+          message,
+          "Your account is not linked to a company.",
+          "error"
+        );
 
         return;
 
@@ -1760,7 +1921,9 @@ if (inviteButton) {
 
 
         const accessToken =
-          sessionData?.session?.access_token;
+          sessionData
+            ?.session
+            ?.access_token;
 
 
         if (!accessToken) {
@@ -1838,15 +2001,11 @@ if (inviteButton) {
         }
 
 
-        if (message) {
-
-          message.textContent =
-            "Invitation sent successfully. The employee will receive an email with a link to create their password.";
-
-          message.className =
-            "auth-message success";
-
-        }
+        showMessage(
+          message,
+          "Invitation sent successfully. The employee will receive an email with a link to create their password.",
+          "success"
+        );
 
 
         const emailInput =
@@ -1854,7 +2013,10 @@ if (inviteButton) {
 
 
         if (emailInput) {
-          emailInput.value = "";
+
+          emailInput.value =
+            "";
+
         }
 
 
@@ -1869,23 +2031,18 @@ if (inviteButton) {
         );
 
 
-        if (message) {
-
-          message.textContent =
-            error.message ||
-            "Unable to send the invitation.";
-
-          message.className =
-            "auth-message error";
-
-        }
+        showMessage(
+          message,
+          error.message ||
+            "Unable to send the invitation.",
+          "error"
+        );
 
 
       } finally {
 
         inviteButton.disabled =
           false;
-
 
         inviteButton.textContent =
           "INVITE EMPLOYEE";
@@ -1963,20 +2120,26 @@ function populateAdminDetails() {
 
 
   if (adminName) {
+
     adminName.textContent =
       name;
+
   }
 
 
   if (adminDashboardName) {
+
     adminDashboardName.textContent =
       name;
+
   }
 
 
   if (adminEmail) {
+
     adminEmail.textContent =
       email;
+
   }
 
 }
@@ -2036,40 +2199,43 @@ async function loadAdminProducts() {
 
 
     container.innerHTML =
-      products.map((product) => `
+      products
+        .map(
+          (product) => `
 
-        <div class="admin-product">
+            <div class="admin-product">
 
-          <div>
+              <div>
 
-            <strong>
-              ${escapeHtml(
-                product.name ||
-                "Product"
-              )}
-            </strong>
+                <strong>
+                  ${escapeHtml(
+                    product.name ||
+                    "Product"
+                  )}
+                </strong>
 
-            <span>
-              ${escapeHtml(
-                product.category ||
-                ""
-              )}
-            </span>
+                <span>
+                  ${escapeHtml(
+                    product.category ||
+                    ""
+                  )}
+                </span>
 
-          </div>
+              </div>
 
+              <div>
 
-          <div>
+                £${Number(
+                  product.price || 0
+                ).toFixed(2)}
 
-            £${Number(
-              product.price || 0
-            ).toFixed(2)}
+              </div>
 
-          </div>
+            </div>
 
-        </div>
-
-      `).join("");
+          `
+        )
+        .join("");
 
 
   } catch (error) {
@@ -2151,70 +2317,76 @@ async function loadAdminOrders() {
 
 
     ordersBody.innerHTML =
-      orders.map((order) => {
+      orders
+        .map((order) => {
 
-        const orderNumber =
-          order.order_number ||
-          order.id?.slice(0, 8) ||
-          "";
-
-
-        const status =
-          order.status ||
-          "Processing";
+          const orderNumber =
+            order.order_number ||
+            order.id?.slice(0, 8) ||
+            "";
 
 
-        const total =
-          Number(
-            order.total || 0
-          ).toFixed(2);
+          const status =
+            order.status ||
+            "Processing";
 
 
-        const date =
-          order.created_at
-            ? new Date(
-                order.created_at
-              ).toLocaleDateString(
-                "en-GB"
-              )
-            : "";
+          const total =
+            Number(
+              order.total || 0
+            ).toFixed(2);
 
 
-        return `
+          const date =
+            order.created_at
+              ? new Date(
+                  order.created_at
+                ).toLocaleDateString(
+                  "en-GB"
+                )
+              : "";
 
-          <tr>
 
-            <td>
-              #${escapeHtml(
-                orderNumber
-              )}
-            </td>
+          return `
 
-            <td>
-              ${escapeHtml(
-                order.company_name ||
-                order.company_id ||
-                "—"
-              )}
-            </td>
+            <tr>
 
-            <td>
-              ${escapeHtml(status)}
-            </td>
+              <td>
+                #${escapeHtml(
+                  orderNumber
+                )}
+              </td>
 
-            <td>
-              £${total}
-            </td>
+              <td>
+                ${escapeHtml(
+                  order.company_name ||
+                  order.company_id ||
+                  "—"
+                )}
+              </td>
 
-            <td>
-              ${escapeHtml(date)}
-            </td>
+              <td>
+                ${escapeHtml(
+                  status
+                )}
+              </td>
 
-          </tr>
+              <td>
+                £${total}
+              </td>
 
-        `;
+              <td>
+                ${escapeHtml(
+                  date
+                )}
+              </td>
 
-      }).join("");
+            </tr>
+
+          `;
+
+        })
+        .join("");
 
 
   } catch (error) {
@@ -2296,31 +2468,35 @@ async function loadAdminCompanies() {
 
 
     container.innerHTML =
-      companies.map((company) => `
+      companies
+        .map(
+          (company) => `
 
-        <div class="admin-company">
+            <div class="admin-company">
 
-          <div>
+              <div>
 
-            <strong>
-              ${escapeHtml(
-                company.name ||
-                "Company"
-              )}
-            </strong>
+                <strong>
+                  ${escapeHtml(
+                    company.name ||
+                    "Company"
+                  )}
+                </strong>
 
-            <span>
-              ${escapeHtml(
-                company.email ||
-                ""
-              )}
-            </span>
+                <span>
+                  ${escapeHtml(
+                    company.email ||
+                    ""
+                  )}
+                </span>
 
-          </div>
+              </div>
 
-        </div>
+            </div>
 
-      `).join("");
+          `
+        )
+        .join("");
 
 
   } catch (error) {
@@ -2396,22 +2572,30 @@ async function logout() {
 
   } finally {
 
-    currentUser = null;
+    currentUser =
+      null;
 
-    currentProfile = null;
+    currentProfile =
+      null;
 
-    currentCompany = null;
+    currentCompany =
+      null;
 
-    currentMembership = null;
+    currentMembership =
+      null;
+
+    authMode =
+      "login";
 
 
-    authMode = "login";
+    setAuthMode(
+      "login"
+    );
 
 
-    setAuthMode("login");
-
-
-    showPanel("authPanel");
+    showPanel(
+      "authPanel"
+    );
 
   }
 
@@ -2432,22 +2616,33 @@ supabase.auth.onAuthStateChange(
 
 
     currentUser =
-      session?.user || null;
+      session?.user ||
+      null;
 
 
     if (
-      event === "SIGNED_OUT"
+      event ===
+      "SIGNED_OUT"
     ) {
 
-      currentProfile = null;
+      currentProfile =
+        null;
 
-      currentCompany = null;
+      currentCompany =
+        null;
 
-      currentMembership = null;
+      currentMembership =
+        null;
 
-      setAuthMode("login");
 
-      showPanel("authPanel");
+      setAuthMode(
+        "login"
+      );
+
+
+      showPanel(
+        "authPanel"
+      );
 
     }
 
@@ -2470,12 +2665,26 @@ if (enquiryForm) {
     async (event) => {
 
       /*
-        This currently allows the existing form
-        handling / Netlify handling to continue.
-      */
+       * IMPORTANT:
+       *
+       * We prevent the browser's normal form
+       * submission and send the enquiry to
+       * the Supabase Edge Function instead.
+       */
+
+      event.preventDefault();
+
 
       const submitButton =
         $("enquirySubmit");
+
+
+      const errorMessage =
+        $("error");
+
+
+      const successMessage =
+        $("success");
 
 
       if (submitButton) {
@@ -2485,6 +2694,179 @@ if (enquiryForm) {
 
         submitButton.textContent =
           "SENDING...";
+
+      }
+
+
+      if (errorMessage) {
+
+        errorMessage.style.display =
+          "none";
+
+      }
+
+
+      if (successMessage) {
+
+        successMessage.style.display =
+          "none";
+
+      }
+
+
+      const formData = {
+
+        name:
+          $("name")
+            ?.value
+            .trim() ||
+          "",
+
+        email:
+          $("email")
+            ?.value
+            .trim() ||
+          "",
+
+        company:
+          $("company")
+            ?.value
+            .trim() ||
+          "",
+
+        enquiry_type:
+          $("enquiry_type")
+            ?.value ||
+          "",
+
+        quantity:
+          $("quantity")
+            ?.value
+            ? Number(
+                $("quantity").value
+              )
+            : null,
+
+        budget:
+          $("budget")
+            ?.value
+            .trim() ||
+          "",
+
+        timeline:
+          $("timeline")
+            ?.value ||
+          "",
+
+        phone:
+          $("phone")
+            ?.value
+            .trim() ||
+          "",
+
+        message:
+          $("message")
+            ?.value
+            .trim() ||
+          ""
+
+      };
+
+
+      try {
+
+        console.log(
+          "[Enquiry] Submitting enquiry..."
+        );
+
+
+        const {
+          data,
+          error
+        } =
+          await supabase.functions.invoke(
+            "submit-enquiry",
+            {
+              body: formData
+            }
+          );
+
+
+        if (error) {
+
+          throw error;
+
+        }
+
+
+        if (
+          !data ||
+          data.success !== true
+        ) {
+
+          throw new Error(
+            data?.error ||
+            "We couldn't submit your enquiry."
+          );
+
+        }
+
+
+        console.log(
+          "[Enquiry] Submitted successfully:",
+          data.enquiry_id
+        );
+
+
+        /*
+         * Hide the form.
+         */
+
+        enquiryForm.style.display =
+          "none";
+
+
+        /*
+         * Show success message.
+         */
+
+        if (successMessage) {
+
+          successMessage.style.display =
+            "block";
+
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          "[Enquiry] Submission error:",
+          error
+        );
+
+
+        if (errorMessage) {
+
+          errorMessage.style.display =
+            "block";
+
+          errorMessage.textContent =
+            error.message ||
+            "We couldn't send your enquiry. Please try again.";
+
+        }
+
+
+        if (submitButton) {
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "SEND ENQUIRY";
+
+        }
 
       }
 
@@ -2509,7 +2891,9 @@ function updateHeader() {
   if (!header) return;
 
 
-  if (window.scrollY > 30) {
+  if (
+    window.scrollY > 30
+  ) {
 
     header.classList.add(
       "scrolled"
@@ -2553,7 +2937,9 @@ document
       (event) => {
 
         const targetId =
-          link.getAttribute("href");
+          link.getAttribute(
+            "href"
+          );
 
 
         if (
@@ -2579,8 +2965,12 @@ document
 
 
         target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+          behavior:
+            "smooth",
+
+          block:
+            "start"
+
         });
 
       }
@@ -2598,8 +2988,8 @@ document
   try {
 
     /*
-      Invitation links must be processed first.
-    */
+     * Invitation links must be processed first.
+     */
 
     if (isInvitationLink()) {
 
@@ -2611,8 +3001,8 @@ document
 
 
     /*
-      Check whether a user is already logged in.
-    */
+     * Check whether a user is already logged in.
+     */
 
     const {
       data,
@@ -2633,7 +3023,9 @@ document
     }
 
 
-    if (data?.session?.user) {
+    if (
+      data?.session?.user
+    ) {
 
       currentUser =
         data.session.user;
