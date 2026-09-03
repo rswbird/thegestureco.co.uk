@@ -1,3 +1,5 @@
-
 [functions.invite-company-member]
+verify_jwt = false
+
+[functions.submit-enquiry]
 verify_jwt = false
